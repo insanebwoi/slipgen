@@ -430,7 +430,7 @@ function Wm({ w, h, wm }: { w: number; h: number; wm: WatermarkConfig }) {
   return (
     <div className="absolute right-0 bottom-0 flex items-end justify-end pointer-events-none" style={{ padding: Math.max(2, h*0.03), zIndex: 3 }}>
       {wm.type === "logo" && wm.logoUrl
-        ? <img src={wm.logoUrl} alt="" style={{ maxHeight: sh*1.5, maxWidth: w*0.3, opacity: op, objectFit: "contain" }} />
+        ? <img src={wm.logoUrl} alt="" style={{ maxHeight: sh*1.5, maxWidth: w*0.3, objectFit: "contain" }} />
         : <span style={{ fontSize: Math.max(4,h*0.045), fontWeight: 800, letterSpacing: 1.5, color: `rgba(0,0,0,${op})`, textTransform: "uppercase" as const, userSelect: "none" as const }}>{wm.text||"SlipGen"}</span>}
     </div>
   );
