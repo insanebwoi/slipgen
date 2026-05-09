@@ -391,8 +391,8 @@ function T4_WavyPattern({ s, t, sc, wm, ci }: SP) {
 function T5_ClassicTraditional({ s, t, sc, wm }: SP) {
   const w=t.width*sc, h=t.height*sc, r=Math.max(3,sc*1);
   const ps=Math.min(w*0.28, h*0.76), pad=Math.max(3,h*0.06);
-  const nf=Math.max(7,h*0.12), ff=Math.max(5,h*0.08);
-  const F = "'Georgia', serif";
+  const nf=Math.max(7,h*0.13), ff=Math.max(5,h*0.08);
+  const F = "'Roboto', sans-serif";
   return (
     <div className="relative overflow-hidden" style={{ width: w, height: h, borderRadius: r, background: "radial-gradient(circle at center, #fffef5 0%, #f5ebd5 100%)", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
       {/* Decorative Vintage Frame */}
@@ -410,7 +410,7 @@ function T5_ClassicTraditional({ s, t, sc, wm }: SP) {
         </div>
         <div className="flex-1 flex flex-col justify-between" style={{ paddingLeft: pad*0.8, paddingRight: pad*0.3, paddingTop: pad*0.3, paddingBottom: pad*0.3 }}>
           <div style={{ textAlign: "center" }}>
-            <AutoText text={s.name} targetLen={12} baseSize={nf*1.05} color="#2d1810" weight={600} style={{ fontFamily: F, letterSpacing: 0.2, margin: "0 auto" }} />
+            <AutoText text={s.name} targetLen={12} baseSize={nf} color="#2d1810" weight={600} style={{ fontFamily: F, letterSpacing: 0.2, margin: "0 auto" }} />
           </div>
           <div className="flex flex-col" style={{ gap: pad*0.5 }}>
             <DottedField l="Subject" v={s.subject} f={ff} lf={ff*0.85} fm={F} />
@@ -434,8 +434,8 @@ function T5_ClassicTraditional({ s, t, sc, wm }: SP) {
 function T6_PlainClassicNoImage({ s, t, sc, wm }: SP) {
   const w=t.width*sc, h=t.height*sc, r=Math.max(3,sc*1);
   const pad=Math.max(3,h*0.06);
-  const nf=Math.max(9,h*0.18), ff=Math.max(5,h*0.09);
-  const F = "'Georgia', serif";
+  const nf=Math.max(7,h*0.13), ff=Math.max(5,h*0.08);
+  const F = "'Roboto', sans-serif";
   return (
     <div className="relative overflow-hidden" style={{ width: w, height: h, borderRadius: r, background: "radial-gradient(circle at center, #fffef5 0%, #f5ebd5 100%)", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
       {/* Decorative Vintage Frame */}
@@ -448,7 +448,7 @@ function T6_PlainClassicNoImage({ s, t, sc, wm }: SP) {
 
       <div className="absolute inset-0 flex flex-col justify-between" style={{ padding: pad*1.5, zIndex: 1 }}>
         <div style={{ textAlign: "center" }}>
-          <AutoText text={s.name} targetLen={20} baseSize={nf*1.2} color="#2d1810" weight={700} style={{ fontFamily: F, letterSpacing: 0.3, margin: "0 auto" }} />
+          <AutoText text={s.name} targetLen={12} baseSize={nf} color="#2d1810" weight={600} style={{ fontFamily: F, letterSpacing: 0.2, margin: "0 auto" }} />
         </div>
         
         <div className="flex flex-col" style={{ gap: pad*0.6 }}>
