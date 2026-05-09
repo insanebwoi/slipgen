@@ -33,15 +33,10 @@ export default function ExportPanel() {
       const { default: jsPDF } = await import("jspdf");
       const { toJpeg, toPng } = await import("html-to-image");
 
-      // Find the visible canvas — there may be multiple instances (mobile, desktop, fullscreen)
-      // so we pick the one that's actually rendered (non-zero offsetWidth).
       const allCanvases = document.querySelectorAll<HTMLElement>("#layout-preview-canvas");
       let previewEl: HTMLElement | null = null;
       for (const el of allCanvases) {
-        if (el.offsetWidth > 0 && el.offsetHeight > 0) {
-          previewEl = el;
-          break;
-        }
+        if (el.offsetWidth > 0 && el.offsetHeight > 0) { previewEl = el; break; }
       }
       if (!previewEl) {
         alert("Preview not found. Please ensure the preview is visible.");
@@ -50,9 +45,6 @@ export default function ExportPanel() {
       }
 
       const preset = QUALITY_PRESETS[quality];
-
-      // Render the live DOM preview to an image at the chosen DPI.
-      // pixelRatio controls the rasterization density (DPI / 96 CSS-px-per-inch).
       const captureOpts = {
         pixelRatio: exportDpi / 96,
         backgroundColor: "#ffffff",
@@ -65,48 +57,65 @@ export default function ExportPanel() {
         : await toJpeg(previewEl, { ...captureOpts, quality: preset.jpegQuality });
 
       const imageMime = preset.usePng ? "PNG" : "JPEG";
-
-      const fileName = students.length > 0 
-        ? `${students[0].name.trim().replace(/\s+/g, '_')}_slipgen` 
+      const fileName = students.length > 0
+        ? `${students[0].name.trim().replace(/\s+/g, '_')}_slipgen`
         : "slipgen-export";
+
+      // Convert data-URL to Blob (required for reliable mobile downloads)
+      const dataUrlToBlob = (dataUrl: string): Blob => {
+        const parts = dataUrl.split(",");
+        const mime = parts[0].match(/:(.*?);/)?.[1] || "application/octet-stream";
+        const bin = atob(parts[1]);
+        const arr = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+        return new Blob([arr], { type: mime });
+      };
+
+      // Mobile-friendly download helper
+      const downloadBlob = async (blob: Blob, name: string) => {
+        // Try Web Share API first (best UX on iOS/Android)
+        if (typeof navigator !== "undefined" && navigator.share && typeof navigator.canShare === "function") {
+          try {
+            const file = new File([blob], name, { type: blob.type });
+            if (navigator.canShare({ files: [file] })) {
+              await navigator.share({ files: [file], title: "SlipGen Export" });
+              return;
+            }
+          } catch {
+            // User cancelled or unsupported — fall through to anchor download
+          }
+        }
+        // Fallback: Blob URL + anchor click
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+      };
 
       let outputBlobSize = 0;
 
       if (exportFormat === "png") {
-        // Direct image download — no PDF wrapping.
-        const link = document.createElement("a");
         const ext = preset.usePng ? "png" : "jpg";
-        link.download = `${fileName}.${ext}`;
-        link.href = imgData;
-        link.click();
-        outputBlobSize = approximateDataUrlByteLength(imgData);
+        const blob = dataUrlToBlob(imgData);
+        outputBlobSize = blob.size;
+        await downloadBlob(blob, `${fileName}.${ext}`);
       } else {
-        // jsPDF v4: compress=true enables zlib stream compression on top of the
-        // already-compressed JPEG. Embedding JPEG inside PDF is the single biggest
-        // size win — a 512-DPI A4 PNG is 8–15 MB, the same content as JPEG-95 is ~600 KB.
         const pdf = new jsPDF({
           orientation: "portrait",
           unit: "mm",
           format: layoutConfig.paperSize === "13x19" ? [330, 483] : layoutConfig.paperSize.toLowerCase() as "a4" | "a3",
           compress: true,
         });
-
         const pdfW = pdf.internal.pageSize.getWidth();
         const pdfH = pdf.internal.pageSize.getHeight();
-        // The fourth-to-last arg "alias" is undefined; the last "compression" hint
-        // applies to PNG embeds — JPEGs ignore it but it's harmless to pass.
         pdf.addImage(imgData, imageMime, 0, 0, pdfW, pdfH, undefined, "FAST");
-
         const blob = pdf.output("blob");
         outputBlobSize = blob.size;
-
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.download = `${fileName}.pdf`;
-        link.href = url;
-        link.click();
-        // Defer revoke so the download has time to start.
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        await downloadBlob(blob, `${fileName}.pdf`);
       }
 
       setLastFileSize(outputBlobSize);
@@ -117,7 +126,7 @@ export default function ExportPanel() {
     } finally {
       setIsExporting(false);
     }
-  }, [selectedTemplate, layoutResult, layoutConfig, exportFormat, exportDpi, quality, setIsExporting]);
+  }, [selectedTemplate, layoutResult, layoutConfig, exportFormat, exportDpi, quality, students, setIsExporting]);
 
   const totalSlips = students.length * layoutConfig.copies;
   const pagesNeeded = layoutResult ? Math.ceil(totalSlips / layoutResult.totalSlips) : 0;
