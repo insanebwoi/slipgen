@@ -484,10 +484,10 @@ function Wm({ w, h, wm }: { w: number; h: number; wm: WatermarkConfig }) {
   if (!wm?.enabled) return null;
   const op = wm.opacity ?? 0.12, sh = h * 0.1;
   return (
-    <div className="absolute right-0 bottom-0 flex items-end justify-end pointer-events-none" style={{ padding: Math.max(2, h*0.03), zIndex: 3, opacity: wm.type === "logo" ? op : 1 }}>
+    <div className="absolute right-0 bottom-0 flex items-end justify-end pointer-events-none" style={{ paddingRight: Math.max(4, h*0.06), paddingBottom: Math.max(4, h*0.1), zIndex: 3, opacity: wm.type === "logo" ? op : 1 }}>
       {wm.type === "logo" && wm.logoUrl
-        ? <img src={wm.logoUrl} alt="" style={{ maxHeight: sh*1.5, maxWidth: w*0.3, objectFit: "contain" }} />
-        : <span style={{ fontSize: Math.max(4,h*0.045), fontWeight: 800, letterSpacing: 1.5, color: `rgba(0,0,0,${op})`, textTransform: "uppercase" as const, userSelect: "none" as const }}>{wm.text||"SlipGen"}</span>}
+        ? <img src={wm.logoUrl} alt="" style={{ maxHeight: sh*0.9, maxWidth: w*0.18, objectFit: "contain" }} />
+        : <span style={{ fontSize: Math.max(4,h*0.04), fontWeight: 800, letterSpacing: 1.5, color: `rgba(0,0,0,${op})`, textTransform: "uppercase" as const, userSelect: "none" as const }}>{wm.text||"SlipGen"}</span>}
     </div>
   );
 }
