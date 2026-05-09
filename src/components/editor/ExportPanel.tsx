@@ -33,7 +33,16 @@ export default function ExportPanel() {
       const { default: jsPDF } = await import("jspdf");
       const { toJpeg, toPng } = await import("html-to-image");
 
-      const previewEl = document.getElementById("layout-preview-canvas");
+      // Find the visible canvas — there may be multiple instances (mobile, desktop, fullscreen)
+      // so we pick the one that's actually rendered (non-zero offsetWidth).
+      const allCanvases = document.querySelectorAll<HTMLElement>("#layout-preview-canvas");
+      let previewEl: HTMLElement | null = null;
+      for (const el of allCanvases) {
+        if (el.offsetWidth > 0 && el.offsetHeight > 0) {
+          previewEl = el;
+          break;
+        }
+      }
       if (!previewEl) {
         alert("Preview not found. Please ensure the preview is visible.");
         setIsExporting(false);
