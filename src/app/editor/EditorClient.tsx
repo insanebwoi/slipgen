@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSlipGenStore } from "@/lib/store";
 import StepIndicator from "@/components/editor/StepIndicator";
 import StudentForm from "@/components/editor/StudentForm";
@@ -10,7 +10,7 @@ import LayoutEngine from "@/components/editor/LayoutEngine";
 import ExportPanel from "@/components/editor/ExportPanel";
 import SlipPreview from "@/components/editor/SlipPreview";
 import Link from "next/link";
-import { Printer, ArrowLeft } from "lucide-react";
+import { Printer, ArrowLeft, Maximize2, X } from "lucide-react";
 import type { UserPlan } from "@/types";
 import UserMenu from "@/components/UserMenu";
 
@@ -22,6 +22,7 @@ const SHOW_DEV_PLAN_SWITCHER =
 
 export default function EditorClient({ serverPlan }: { serverPlan: UserPlan }) {
   const { currentStep, userPlan, setUserPlan } = useSlipGenStore();
+  const [fullscreen, setFullscreen] = useState(false);
 
   // The server is the source of truth for plan; sync the store on mount and
   // whenever the prop changes (e.g. after a plan upgrade).
@@ -82,10 +83,18 @@ export default function EditorClient({ serverPlan }: { serverPlan: UserPlan }) {
 
       <div className="relative z-10 flex-1 flex flex-col lg:flex-row">
         {/* Mobile preview: shown at top on small screens */}
-        <div className="lg:hidden w-full overflow-auto" style={{ background: "var(--surface)", maxHeight: "40vh", borderBottom: "1px solid var(--border)" }}>
+        <div className="lg:hidden w-full overflow-auto relative" style={{ background: "var(--surface)", maxHeight: "40vh", borderBottom: "1px solid var(--border)" }}>
           <div className="p-4">
             <SlipPreview />
           </div>
+          <button
+            onClick={() => setFullscreen(true)}
+            className="absolute top-3 right-3 p-2 rounded-lg transition-all hover:scale-105"
+            style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)" }}
+            title="Fullscreen Preview"
+          >
+            <Maximize2 className="w-4 h-4 text-white" />
+          </button>
         </div>
 
         {/* Controls panel */}
@@ -94,10 +103,45 @@ export default function EditorClient({ serverPlan }: { serverPlan: UserPlan }) {
         </div>
 
         {/* Desktop preview: side panel on large screens */}
-        <div className="hidden lg:flex flex-1 items-center justify-center p-8 overflow-auto" style={{ background: "var(--surface)", maxHeight: "calc(100vh - 57px)" }}>
+        <div className="hidden lg:flex flex-1 items-center justify-center p-8 overflow-auto relative" style={{ background: "var(--surface)", maxHeight: "calc(100vh - 57px)" }}>
           <SlipPreview />
+          <button
+            onClick={() => setFullscreen(true)}
+            className="absolute top-4 right-4 p-2.5 rounded-xl transition-all hover:scale-105"
+            style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(8px)" }}
+            title="Fullscreen Preview"
+          >
+            <Maximize2 className="w-5 h-5 text-white" />
+          </button>
         </div>
       </div>
+
+      {/* Fullscreen Preview Modal */}
+      {fullscreen && (
+        <div className="fixed inset-0 z-50 flex flex-col" style={{ background: "var(--bg)" }}>
+          {/* Fullscreen header */}
+          <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: "1px solid var(--border)" }}>
+            <div className="flex items-center gap-2">
+              <Printer className="w-5 h-5" style={{ color: "var(--primary)" }} />
+              <span className="font-bold text-sm" style={{ fontFamily: "var(--font-display)" }}>
+                Preview <span style={{ color: "var(--text-muted)" }}>— Fullscreen</span>
+              </span>
+            </div>
+            <button
+              onClick={() => setFullscreen(false)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all hover:bg-white/10"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              <X className="w-4 h-4" />
+              Close
+            </button>
+          </div>
+          {/* Fullscreen preview area */}
+          <div className="flex-1 overflow-auto flex items-start justify-center p-6" style={{ background: "var(--surface)" }}>
+            <SlipPreview />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
