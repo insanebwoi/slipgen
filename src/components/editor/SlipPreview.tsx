@@ -170,7 +170,7 @@ function Pic({ url, size, round, border }: { url: string|null; size: number; rou
 function AutoText({ text, targetLen, baseSize, color, weight, style, className }: { text: string; targetLen: number; baseSize: number; color: string; weight: number; style?: React.CSSProperties; className?: string }) {
   const str = (text || " ").trim();
   const len = Math.max(4, str.length);
-  const scale = len < targetLen ? Math.min(1.15, targetLen / len) : Math.max(0.45, targetLen / len);
+  const scale = len < targetLen ? Math.min(1.15, targetLen / len) : Math.max(0.6, targetLen / len);
   return <p className={className} style={{ ...style, fontSize: baseSize * scale, fontWeight: weight, color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", lineHeight: style?.lineHeight || 1.2 }}>{str || " "}</p>;
 }
 
@@ -434,7 +434,7 @@ function T5_ClassicTraditional({ s, t, sc, wm }: SP) {
 function T6_PlainClassicNoImage({ s, t, sc, wm }: SP) {
   const w=t.width*sc, h=t.height*sc, r=Math.max(3,sc*1);
   const pad=Math.max(3,h*0.06);
-  const nf=Math.max(7,h*0.14), ff=Math.max(5,h*0.09);
+  const nf=Math.max(9,h*0.18), ff=Math.max(5,h*0.09);
   const F = "'Georgia', serif";
   return (
     <div className="relative overflow-hidden" style={{ width: w, height: h, borderRadius: r, background: "radial-gradient(circle at center, #fffef5 0%, #f5ebd5 100%)", boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
@@ -448,7 +448,7 @@ function T6_PlainClassicNoImage({ s, t, sc, wm }: SP) {
 
       <div className="absolute inset-0 flex flex-col justify-between" style={{ padding: pad*1.5, zIndex: 1 }}>
         <div style={{ textAlign: "center" }}>
-          <AutoText text={s.name} targetLen={18} baseSize={nf*1.15} color="#2d1810" weight={600} style={{ fontFamily: F, letterSpacing: 0.2, margin: "0 auto" }} />
+          <AutoText text={s.name} targetLen={20} baseSize={nf*1.2} color="#2d1810" weight={700} style={{ fontFamily: F, letterSpacing: 0.3, margin: "0 auto" }} />
         </div>
         
         <div className="flex flex-col" style={{ gap: pad*0.6 }}>
