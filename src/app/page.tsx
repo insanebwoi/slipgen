@@ -1,6 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
   Printer,
   Sparkles,
@@ -13,9 +15,22 @@ import {
   ArrowRight,
   Star,
   Check,
+  LogIn,
 } from "lucide-react";
 
 export default function HomePage() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    const supabase = getSupabaseBrowserClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session?.user);
+      setUserEmail(session?.user?.email ?? null);
+      setChecking(false);
+    });
+  }, []);
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* Mesh gradient background */}
@@ -50,12 +65,34 @@ export default function HomePage() {
           </a>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/login" className="text-sm hidden md:inline" style={{ color: "var(--text-secondary)" }}>
-            Sign in
-          </Link>
-          <Link href="/editor" className="btn-primary text-sm px-5 py-2.5">
-            Get Started
-          </Link>
+          {checking ? (
+            <div className="w-20 h-9 rounded-lg animate-pulse" style={{ background: "var(--surface-elevated)" }} />
+          ) : isLoggedIn ? (
+            <>
+              <Link href="/editor" className="btn-primary text-sm px-5 py-2.5 inline-flex items-center gap-2">
+                Open Editor
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/editor"
+                className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                style={{ background: "var(--gradient-primary)" }}
+                title={userEmail || "Account"}
+              >
+                {(userEmail?.[0] || "U").toUpperCase()}
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="text-sm hidden md:inline-flex items-center gap-1.5" style={{ color: "var(--text-secondary)" }}>
+                <LogIn className="w-3.5 h-3.5" />
+                Sign in
+              </Link>
+              <Link href="/editor" className="btn-primary text-sm px-5 py-2.5">
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
@@ -107,7 +144,7 @@ export default function HomePage() {
             href="/editor"
             className="btn-primary inline-flex items-center gap-2 text-base px-8 py-3.5"
           >
-            Start Creating
+            {isLoggedIn ? "Continue to Editor" : "Start Creating"}
             <ArrowRight className="w-4 h-4" />
           </Link>
           <a
@@ -507,7 +544,7 @@ export default function HomePage() {
               href="/editor"
               className="btn-primary inline-flex items-center gap-2 text-base px-10 py-4"
             >
-              Create Your First Slip
+              {isLoggedIn ? "Open Editor" : "Create Your First Slip"}
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
