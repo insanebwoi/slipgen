@@ -55,7 +55,7 @@ const defaultLayoutConfig: LayoutConfig = {
   bleedMargin: 3,
 };
 
-// SlipGen brand logo lives at /public/logo.png (any image format works — change the path if needed).
+// SlipGen brand mark used as the default watermark logo.
 export const SLIPGEN_LOGO_URL = '/logo.png';
 
 const defaultWatermark: WatermarkConfig = {

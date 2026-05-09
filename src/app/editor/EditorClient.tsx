@@ -10,7 +10,8 @@ import LayoutEngine from "@/components/editor/LayoutEngine";
 import ExportPanel from "@/components/editor/ExportPanel";
 import SlipPreview from "@/components/editor/SlipPreview";
 import Link from "next/link";
-import { Printer, ArrowLeft, Maximize2, X } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft, Maximize2, X } from "lucide-react";
 import type { UserPlan } from "@/types";
 import UserMenu from "@/components/UserMenu";
 
@@ -53,7 +54,7 @@ export default function EditorClient({ serverPlan }: { serverPlan: UserPlan }) {
           <div className="w-px h-5" style={{ background: "var(--border)" }}></div>
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ background: "var(--gradient-primary)" }}>
-              <Printer className="w-4 h-4 text-white" />
+              <Image src="/brand/logo-white.svg" alt="SlipGen" width={18} height={18} priority />
             </div>
             <span className="font-bold text-sm" style={{ fontFamily: "var(--font-display)" }}>
               SlipGen <span style={{ color: "var(--text-muted)" }}>Editor</span>
@@ -122,7 +123,7 @@ export default function EditorClient({ serverPlan }: { serverPlan: UserPlan }) {
           {/* Fullscreen header */}
           <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: "1px solid var(--border)" }}>
             <div className="flex items-center gap-2">
-              <Printer className="w-5 h-5" style={{ color: "var(--primary)" }} />
+              <Image src="/brand/logo-color.svg" alt="" width={20} height={20} aria-hidden="true" />
               <span className="font-bold text-sm" style={{ fontFamily: "var(--font-display)" }}>
                 Preview <span style={{ color: "var(--text-muted)" }}>— Fullscreen</span>
               </span>

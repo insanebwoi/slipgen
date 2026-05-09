@@ -408,7 +408,7 @@ function T5_ClassicTraditional({ s, t, sc, wm }: SP) {
         <div className="flex items-center justify-center" style={{ width: w*0.32 }}>
           <Pic url={s.aiImageUrl||s.imageUrl} size={ps} border="2.5px solid #5a3e1b" />
         </div>
-        <div className="flex-1 flex flex-col justify-center" style={{ paddingLeft: pad*0.8, paddingRight: pad*0.3, gap: pad*1.2 }}>
+        <div className="flex-1 flex flex-col justify-between" style={{ paddingLeft: pad*0.8, paddingRight: pad*0.3, paddingTop: pad*0.3, paddingBottom: pad*0.3 }}>
           <div style={{ textAlign: "center" }}>
             <AutoText text={s.name} targetLen={12} baseSize={nf*1.05} color="#2d1810" weight={600} style={{ fontFamily: F, letterSpacing: 0.2, margin: "0 auto" }} />
           </div>
@@ -420,7 +420,7 @@ function T5_ClassicTraditional({ s, t, sc, wm }: SP) {
               <DottedField l="Roll" v={s.rollNo} f={ff} lf={ff*0.85} fm={F} />
             </div>
           </div>
-          <AutoText text={s.schoolName} targetLen={22} baseSize={ff*0.9} color="#8b6914" weight={700} style={{ fontFamily: F, textAlign: "center", borderTop: "1px solid #daa520", paddingTop: 3 }} />
+          <AutoText text={s.schoolName || "School Name"} targetLen={22} baseSize={ff*0.9} color="#8b6914" weight={700} style={{ fontFamily: F, textAlign: "center", borderTop: "1px solid #daa520", paddingTop: 2 }} />
         </div>
       </div>
       <Wm w={w} h={h} wm={wm} />
@@ -446,12 +446,12 @@ function T6_PlainClassicNoImage({ s, t, sc, wm }: SP) {
       <div className="absolute bottom-0 left-0" style={{ width: sc*5, height: sc*5, borderTopRightRadius: "100%", border: "1px solid #8b6914", borderBottom: "none", borderLeft: "none" }} />
       <div className="absolute bottom-0 right-0" style={{ width: sc*5, height: sc*5, borderTopLeftRadius: "100%", border: "1px solid #8b6914", borderBottom: "none", borderRight: "none" }} />
 
-      <div className="absolute inset-0 flex flex-col justify-center" style={{ padding: pad*1.8, gap: pad*1.5, zIndex: 1 }}>
+      <div className="absolute inset-0 flex flex-col justify-between" style={{ padding: pad*1.5, zIndex: 1 }}>
         <div style={{ textAlign: "center" }}>
           <AutoText text={s.name} targetLen={18} baseSize={nf*1.15} color="#2d1810" weight={600} style={{ fontFamily: F, letterSpacing: 0.2, margin: "0 auto" }} />
         </div>
         
-        <div className="flex flex-col" style={{ gap: pad*0.8 }}>
+        <div className="flex flex-col" style={{ gap: pad*0.6 }}>
           <DottedField l="Subject" v={s.subject} f={ff} lf={ff*0.85} fm={F} />
           <div className="flex" style={{ gap: ff*0.8 }}>
             <DottedField l="Class" v={s.className} f={ff} lf={ff*0.85} fm={F} />
@@ -460,7 +460,7 @@ function T6_PlainClassicNoImage({ s, t, sc, wm }: SP) {
           </div>
         </div>
 
-        <AutoText text={s.schoolName} targetLen={30} baseSize={ff*0.9} color="#8b6914" weight={700} style={{ fontFamily: F, textAlign: "center", borderTop: "1px solid #daa520", paddingTop: 3 }} />
+        <AutoText text={s.schoolName || "School Name"} targetLen={30} baseSize={ff*0.9} color="#8b6914" weight={700} style={{ fontFamily: F, textAlign: "center", borderTop: "1px solid #daa520", paddingTop: 2 }} />
       </div>
       <Wm w={w} h={h} wm={wm} />
     </div>
