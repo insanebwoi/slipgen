@@ -66,13 +66,17 @@ export default function ExportPanel() {
 
       const imageMime = preset.usePng ? "PNG" : "JPEG";
 
+      const fileName = students.length > 0 
+        ? `${students[0].name.trim().replace(/\s+/g, '_')}_slipgen` 
+        : "slipgen-export";
+
       let outputBlobSize = 0;
 
       if (exportFormat === "png") {
         // Direct image download — no PDF wrapping.
         const link = document.createElement("a");
         const ext = preset.usePng ? "png" : "jpg";
-        link.download = `slipgen-export-${Date.now()}.${ext}`;
+        link.download = `${fileName}.${ext}`;
         link.href = imgData;
         link.click();
         outputBlobSize = approximateDataUrlByteLength(imgData);
@@ -98,7 +102,7 @@ export default function ExportPanel() {
 
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
-        link.download = `slipgen-export-${Date.now()}.pdf`;
+        link.download = `${fileName}.pdf`;
         link.href = url;
         link.click();
         // Defer revoke so the download has time to start.
