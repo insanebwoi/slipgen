@@ -46,9 +46,10 @@ interface SlipGenStore {
 
 const defaultLayoutConfig: LayoutConfig = {
   paperSize: 'A4',
-  margin: 8,
-  gap: 2,
-  copies: 1,
+  margin: 0,
+  gap: 0,
+  copies: 1, // Will be overridden by autoFillPage logic immediately
+  autoFillPage: true,
   showCropMarks: true,
   showBleedMargin: false,
   bleedMargin: 3,
@@ -116,14 +117,26 @@ export const useSlipGenStore = create<SlipGenStore>((set, get) => ({
     const state = get();
     if (template) {
       const result = calculateLayout(template.width, template.height, state.layoutConfig);
-      set({ layoutResult: result });
+      set({ 
+        layoutResult: result,
+        layoutConfig: state.layoutConfig.autoFillPage 
+          ? { ...state.layoutConfig, copies: result.totalSlips } 
+          : state.layoutConfig
+      });
     }
   },
 
   layoutConfig: defaultLayoutConfig,
   layoutResult: null,
   setLayoutConfig: (config) => {
-    set((state) => ({ layoutConfig: { ...state.layoutConfig, ...config } }));
+    set((state) => {
+      const newConfig = { ...state.layoutConfig, ...config };
+      // If the user manually changes 'copies', disable auto-fill.
+      if (config.copies !== undefined) {
+        newConfig.autoFillPage = false;
+      }
+      return { layoutConfig: newConfig };
+    });
     setTimeout(() => get().recalculateLayout(), 0);
   },
   recalculateLayout: () => {
@@ -134,7 +147,21 @@ export const useSlipGenStore = create<SlipGenStore>((set, get) => ({
         state.selectedTemplate.height,
         state.layoutConfig
       );
-      set({ layoutResult: result });
+      
+      const newCopies = state.layoutConfig.autoFillPage 
+        ? result.totalSlips 
+        : state.layoutConfig.copies;
+
+      // Only update if something actually changed to avoid infinite loops
+      const hasResultChanged = JSON.stringify(state.layoutResult) !== JSON.stringify(result);
+      const hasCopiesChanged = state.layoutConfig.copies !== newCopies;
+
+      if (hasResultChanged || hasCopiesChanged) {
+        set({ 
+          layoutResult: result,
+          layoutConfig: { ...state.layoutConfig, copies: newCopies }
+        });
+      }
     }
   },
 

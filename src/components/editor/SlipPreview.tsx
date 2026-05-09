@@ -1,16 +1,26 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSlipGenStore } from "@/lib/store";
 import { PAPER_SIZES, Student, Template, WatermarkConfig } from "@/types";
 import { getPassionTheme } from "@/lib/templates";
-import { User, Printer } from "lucide-react";
+import { User, Printer, ZoomIn, ZoomOut, Maximize } from "lucide-react";
 
 const PREVIEW_SCALE = 3;
 
 export default function SlipPreview() {
   const { students, selectedTemplate, layoutConfig, layoutResult, recalculateLayout, currentStep, watermark } = useSlipGenStore();
-  useEffect(() => { recalculateLayout(); }, [selectedTemplate, layoutConfig]);
+  const [zoom, setZoom] = useState(0.5); // Default to 50% so large previews fit better initially
+  useEffect(() => { 
+    recalculateLayout(); 
+  }, [
+    selectedTemplate, 
+    layoutConfig.paperSize, 
+    layoutConfig.margin, 
+    layoutConfig.gap,
+    recalculateLayout
+  ]);
 
   const paper = selectedTemplate ? PAPER_SIZES[layoutConfig.paperSize] : null;
   const paperW = paper ? paper.width * PREVIEW_SCALE : 0;
@@ -62,10 +72,44 @@ export default function SlipPreview() {
     );
   }
 
+  const handleZoomIn = () => setZoom(z => Math.min(z + 0.25, 2));
+  const handleZoomOut = () => setZoom(z => Math.max(z - 0.25, 0.25));
+  const handleZoomReset = () => setZoom(1);
+
   return (
-    <div className="flex flex-col items-center gap-4">
-      <p className="text-xs font-medium uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>Print Layout — {layoutConfig.paperSize}</p>
-      <div id="layout-preview-canvas" className="paper-preview relative" style={{ width: paperW, height: paperH }}>
+    <div className="flex flex-col items-center gap-4 w-full">
+      <div className="flex items-center justify-between w-full max-w-3xl px-4">
+        <p className="text-xs font-medium uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>Print Layout — {layoutConfig.paperSize}</p>
+        
+        <div className="flex items-center gap-1.5 bg-[var(--surface)] rounded-lg p-1 border shadow-sm" style={{ borderColor: 'var(--border)' }}>
+          <button onClick={handleZoomOut} className="p-1.5 hover:bg-black/5 dark:hover:bg-white/10 rounded transition-colors" style={{ color: 'var(--text-secondary)' }} title="Zoom Out">
+            <ZoomOut className="w-4 h-4" />
+          </button>
+          <span className="text-xs font-medium w-10 text-center" style={{ color: 'var(--text-secondary)' }}>
+            {Math.round(zoom * 100)}%
+          </span>
+          <button onClick={handleZoomIn} className="p-1.5 hover:bg-black/5 dark:hover:bg-white/10 rounded transition-colors" style={{ color: 'var(--text-secondary)' }} title="Zoom In">
+            <ZoomIn className="w-4 h-4" />
+          </button>
+          <div className="w-px h-4 mx-1" style={{ background: 'var(--border)' }}></div>
+          <button onClick={handleZoomReset} className="p-1.5 hover:bg-black/5 dark:hover:bg-white/10 rounded transition-colors" style={{ color: 'var(--text-secondary)' }} title="100% Zoom">
+            <Maximize className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      <div className="w-full flex justify-center overflow-auto custom-scrollbar pb-8" style={{ maxHeight: '70vh' }}>
+        <div style={{ width: paperW * zoom, height: paperH * zoom, transition: 'width 0.2s, height 0.2s' }} className="flex-shrink-0">
+          <div 
+            id="layout-preview-canvas" 
+            className="paper-preview relative shadow-xl bg-white transition-transform duration-200" 
+            style={{ 
+              width: paperW, 
+              height: paperH,
+              transform: `scale(${zoom})`,
+              transformOrigin: "top left"
+            }}
+          >
         {slotAssignments.map(({ student, copyIndex, position }, i) => {
           // Slot is sized to the engine's chosen orientation (slipW/slipH).
           // The slip itself always renders at template.width × template.height — when the engine
@@ -92,6 +136,8 @@ export default function SlipPreview() {
         {layoutConfig.showCropMarks && slotAssignments.map(({ position }, i) => (
           <CropMarks key={`c-${i}`} x={position.x * PREVIEW_SCALE} y={position.y * PREVIEW_SCALE} w={slipW} h={slipH} />
         ))}
+      </div>
+      </div>
       </div>
       {layoutResult && <p className="text-xs" style={{ color: "var(--text-muted)" }}>{slotAssignments.length} of {layoutResult.totalSlips} slots • {layoutResult.cols}×{layoutResult.rows} grid</p>}
     </div>
@@ -250,12 +296,22 @@ function T3_CartoonFun({ s, t, sc, wm, ci }: SP) {
   const w=t.width*sc, h=t.height*sc, r=Math.max(5,sc*2);
   // Each copy of a student rotates through a different cartoon background+accent so 10 copies look 10 different.
   const variants = [
-    { bg: "/backgrounds/doctor.png",    color: "#0284c7" },
-    { bg: "/backgrounds/engineer.png",  color: "#ea580c" },
-    { bg: "/backgrounds/scientist.png", color: "#7c3aed" },
-    { bg: "/backgrounds/pilot.png",     color: "#2563eb" },
-    { bg: "/backgrounds/artist.png",    color: "#db2777" },
-    { bg: "/backgrounds/nature.png",    color: "#059669" },
+    { bg: "/backgrounds/doctor.png",      color: "#0284c7" },
+    { bg: "/backgrounds/engineer.png",    color: "#ea580c" },
+    { bg: "/backgrounds/scientist.png",   color: "#7c3aed" },
+    { bg: "/backgrounds/pilot.png",       color: "#2563eb" },
+    { bg: "/backgrounds/artist.png",      color: "#db2777" },
+    { bg: "/backgrounds/nature.png",      color: "#059669" },
+    { bg: "/backgrounds/chef.png",        color: "#f59e0b" },
+    { bg: "/backgrounds/astronaut.png",   color: "#6366f1" },
+    { bg: "/backgrounds/musician.png",    color: "#ec4899" },
+    { bg: "/backgrounds/athlete.png",     color: "#ef4444" },
+    { bg: "/backgrounds/firefighter.png", color: "#f97316" },
+    { bg: "/backgrounds/police.png",      color: "#3b82f6" },
+    { bg: "/backgrounds/classroom.png",   color: "#10b981" },
+    { bg: "/backgrounds/ocean.png",       color: "#06b6d4" },
+    { bg: "/backgrounds/forest.png",      color: "#22c55e" },
+    { bg: "/backgrounds/rainbow.png",     color: "#a855f7" },
   ];
   const studentBase = getPassionTheme(s.passion || "Other");
   const nameSeed = (s.name || "").charCodeAt(0) || 0;
@@ -428,7 +484,7 @@ function Wm({ w, h, wm }: { w: number; h: number; wm: WatermarkConfig }) {
   if (!wm?.enabled) return null;
   const op = wm.opacity ?? 0.12, sh = h * 0.1;
   return (
-    <div className="absolute right-0 bottom-0 flex items-end justify-end pointer-events-none" style={{ padding: Math.max(2, h*0.03), zIndex: 3 }}>
+    <div className="absolute right-0 bottom-0 flex items-end justify-end pointer-events-none" style={{ padding: Math.max(2, h*0.03), zIndex: 3, opacity: wm.type === "logo" ? op : 1 }}>
       {wm.type === "logo" && wm.logoUrl
         ? <img src={wm.logoUrl} alt="" style={{ maxHeight: sh*1.5, maxWidth: w*0.3, objectFit: "contain" }} />
         : <span style={{ fontSize: Math.max(4,h*0.045), fontWeight: 800, letterSpacing: 1.5, color: `rgba(0,0,0,${op})`, textTransform: "uppercase" as const, userSelect: "none" as const }}>{wm.text||"SlipGen"}</span>}

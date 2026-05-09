@@ -1,8 +1,9 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState, useCallback } from "react";
 import { useSlipGenStore } from "@/lib/store";
-import { processImageWithAI, softCartoonize } from "@/lib/ai-processor";
+import { processImageWithAI, softCartoonize, AIQuotaError } from "@/lib/ai-processor";
 import { getPassionTheme } from "@/lib/templates";
 import { ArrowLeft, ArrowRight, Sparkles, Loader2, CheckCircle2, AlertCircle, Wand2, RotateCcw, Lock, Crown } from "lucide-react";
 
@@ -10,6 +11,7 @@ export default function AIProcessor() {
   const { students, updateStudent, setStep, userPlan } = useSlipGenStore();
   const [processing, setProcessing] = useState(false);
   const [currentIdx, setCurrentIdx] = useState(-1);
+  const [quotaError, setQuotaError] = useState<string | null>(null);
 
   const processedCount = students.filter((s) => s.aiProcessed).length;
   const allProcessed = students.length > 0 && processedCount === students.length;
@@ -19,6 +21,7 @@ export default function AIProcessor() {
 
   const processAll = useCallback(async () => {
     setProcessing(true);
+    setQuotaError(null);
 
     for (let i = 0; i < students.length; i++) {
       const student = students[i];
@@ -31,7 +34,6 @@ export default function AIProcessor() {
         let aiImageUrl: string;
 
         if (canUseRealAI) {
-          // Standard plan: Real AI via Pollinations
           aiImageUrl = await processImageWithAI(
             student.imageUrl || '',
             student.passion,
@@ -39,11 +41,9 @@ export default function AIProcessor() {
             student.gender || 'child'
           );
         } else {
-          // Free/Basic/Standard: Client-side cartoon effect only
           if (student.imageUrl) {
             aiImageUrl = await softCartoonize(student.imageUrl, student.passion);
           } else {
-            // No photo + no AI = keep original
             aiImageUrl = student.imageUrl || '';
           }
         }
@@ -54,6 +54,13 @@ export default function AIProcessor() {
           aiProcessed: true,
         });
       } catch (err) {
+        if (err instanceof AIQuotaError) {
+          // Stop the run and tell the user — don't silently fall back when the
+          // server has explicitly denied the request (auth, plan, or quota).
+          setQuotaError(err.message);
+          updateStudent(student.id, { aiProcessing: false });
+          break;
+        }
         console.error('AI processing failed for', student.name, err);
         updateStudent(student.id, {
           aiImageUrl: student.imageUrl,
@@ -192,6 +199,13 @@ export default function AIProcessor() {
         <div className="p-3 rounded-lg flex items-start gap-2 mb-5" style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)" }}>
           <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "var(--warning)" }} />
           <p className="text-xs" style={{ color: "var(--warning)" }}>No students added. Go back to add students first.</p>
+        </div>
+      )}
+
+      {quotaError && (
+        <div className="p-3 rounded-lg flex items-start gap-2 mb-5" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)" }}>
+          <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "var(--error)" }} />
+          <p className="text-xs" style={{ color: "var(--error)" }}>{quotaError}</p>
         </div>
       )}
 

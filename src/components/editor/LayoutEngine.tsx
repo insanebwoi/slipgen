@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useEffect, useRef } from "react";
@@ -9,6 +10,7 @@ export default function LayoutEngine() {
   const { layoutConfig, setLayoutConfig, layoutResult, recalculateLayout, setStep, students, watermark, setWatermark, userPlan } = useSlipGenStore();
   const logoInputRef = useRef<HTMLInputElement>(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { recalculateLayout(); }, []);
 
   const paperSizes = Object.keys(PAPER_SIZES) as PaperSize[];
@@ -84,11 +86,12 @@ export default function LayoutEngine() {
           </label>
           {layoutResult && (
             <button
-              onClick={() => setLayoutConfig({ copies: layoutResult.totalSlips })}
-              className="text-xs font-semibold px-2 py-0.5 rounded-md transition-colors"
-              style={{ background: "var(--primary-light)", color: "var(--primary)" }}
+              onClick={() => setLayoutConfig({ autoFillPage: true })}
+              className={`text-xs font-semibold px-2 py-0.5 rounded-md transition-colors ${
+                layoutConfig.autoFillPage ? "bg-[var(--primary)] text-white" : "bg-[var(--primary-light)] text-[var(--primary)]"
+              }`}
             >
-              Fill Page ({layoutResult.totalSlips})
+              {layoutConfig.autoFillPage ? "Auto-Filling" : "Fill Page"} ({layoutResult.totalSlips})
             </button>
           )}
         </div>
@@ -112,7 +115,7 @@ export default function LayoutEngine() {
         <div className="flex items-center gap-3">
           <input
             type="range"
-            min={3} max={25} value={layoutConfig.margin}
+            min={0} max={25} value={layoutConfig.margin}
             onChange={(e) => setLayoutConfig({ margin: parseInt(e.target.value) })}
             className="flex-1 accent-[var(--primary)]"
           />
@@ -285,11 +288,11 @@ export default function LayoutEngine() {
             {/* Opacity */}
             <div>
               <label className="text-xs mb-1 block" style={{ color: "var(--text-secondary)" }}>
-                Opacity: {Math.round(watermark.opacity * 100)}%
+                Opacity: {Math.round((watermark.opacity ?? 0.15) * 100)}%
               </label>
               <input
                 type="range"
-                min={3} max={30} value={Math.round(watermark.opacity * 100)}
+                min={20} max={100} value={Math.round((watermark.opacity ?? 0.15) * 100)}
                 onChange={(e) => setWatermark({ opacity: parseInt(e.target.value) / 100 })}
                 className="w-full accent-[var(--primary)]"
               />

@@ -27,8 +27,18 @@ export function getAIPrompt(passion: string): string {
   return prompts[passion] || prompts.Other;
 }
 
+export class AIQuotaError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = 'AIQuotaError';
+    this.status = status;
+  }
+}
+
 /**
- * Main entry: server AI → client soft-cartoon fallback
+ * Main entry: server AI → client soft-cartoon fallback.
+ * Throws AIQuotaError on hard auth/plan/quota rejections so the UI can surface them.
  */
 export async function processImageWithAI(
   imageDataUrl: string,
@@ -36,7 +46,6 @@ export async function processImageWithAI(
   studentName?: string,
   gender?: string
 ): Promise<string> {
-  // Try server AI (Pollinations.ai FREE / fal.ai / Replicate)
   try {
     const resp = await fetch('/api/ai-process', {
       method: 'POST',
@@ -48,15 +57,22 @@ export async function processImageWithAI(
         studentName: studentName || 'Student',
         gender: gender || 'child',
       }),
-      signal: AbortSignal.timeout(90000), // 90s for Pollinations
+      signal: AbortSignal.timeout(90000),
     });
+
+    // Hard rejections: surface to the user instead of silently degrading.
+    if (resp.status === 401 || resp.status === 402 || resp.status === 403 || resp.status === 429) {
+      const data = await resp.json().catch(() => ({}));
+      throw new AIQuotaError(data?.message || `AI request rejected (${resp.status})`, resp.status);
+    }
+
     const data = await resp.json();
     if (resp.ok && data.imageUrl) return data.imageUrl;
-  } catch {
-    // API unavailable
+  } catch (err) {
+    if (err instanceof AIQuotaError) throw err;
+    // API unavailable (network/timeout/5xx) — fall through to client-side cartoon.
   }
 
-  // Client-side soft cartoon effect (fallback)
   console.log('[AI] Using soft cartoon effect');
   return softCartoonize(imageDataUrl, passion);
 }

@@ -33,7 +33,7 @@ export default function UserMenu() {
         .eq("id", user.id)
         .single();
       if (!cancelled) {
-        setSnap(profile ? { email: profile.email, plan: profile.plan as UserPlan, isAdmin: profile.role === "admin" } : null);
+        setSnap(profile ? { email: profile.email, plan: profile.plan as UserPlan, isAdmin: profile.role === "admin" || profile.role === "super_admin" } : null);
         setLoading(false);
       }
     };

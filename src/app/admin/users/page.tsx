@@ -1,7 +1,7 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/supabase/auth";
 import type { AdminUserStats } from "@/lib/supabase/types";
-import { updateUserPlanAction, updateUserRoleAction, setUserBannedAction } from "./actions";
+import { PlanForm, UserRoleCell, BanForm } from "./RowForms";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +20,7 @@ export default async function AdminUsersPage() {
   }
 
   const users = (data ?? []) as AdminUserStats[];
+  const isSuperAdmin = me.role === "super_admin";
 
   return (
     <div className="max-w-6xl">
@@ -43,48 +44,27 @@ export default async function AdminUsersPage() {
           <tbody>
             {users.map((u) => (
               <tr key={u.id} style={{ borderBottom: "1px solid var(--border)" }}>
-                <td className="p-3">
+                <td className="p-3 align-top">
                   <div className="font-medium">{u.full_name || u.email.split("@")[0]}</div>
                   <div className="text-xs" style={{ color: "var(--text-muted)" }}>{u.email}</div>
                 </td>
-                <td className="p-3">
-                  <form action={updateUserPlanAction} className="flex items-center gap-2">
-                    <input type="hidden" name="user_id" value={u.id} />
-                    <select name="plan" defaultValue={u.plan} className="text-xs rounded-md px-2 py-1 border" style={{ background: "var(--surface-elevated)", borderColor: "var(--border)" }}>
-                      <option value="free">free</option>
-                      <option value="basic">basic</option>
-                      <option value="standard">standard</option>
-                    </select>
-                    <button type="submit" className="text-xs underline" style={{ color: "var(--primary)" }}>save</button>
-                  </form>
+                <td className="p-3 align-top">
+                  <PlanForm userId={u.id} currentPlan={u.plan} />
                 </td>
-                <td className="p-3">
-                  <form action={updateUserRoleAction} className="flex items-center gap-2">
-                    <input type="hidden" name="user_id" value={u.id} />
-                    <select name="role" defaultValue={u.role} disabled={u.id === me.id} className="text-xs rounded-md px-2 py-1 border" style={{ background: "var(--surface-elevated)", borderColor: "var(--border)" }}>
-                      <option value="user">user</option>
-                      <option value="admin">admin</option>
-                    </select>
-                    {u.id !== me.id && <button type="submit" className="text-xs underline" style={{ color: "var(--primary)" }}>save</button>}
-                  </form>
+                <td className="p-3 align-top">
+                  <UserRoleCell user={u} canEdit={isSuperAdmin && u.role !== "super_admin"} />
                 </td>
-                <td className="p-3">{u.total_slips_exported.toLocaleString()}</td>
-                <td className="p-3">{u.total_ai_runs.toLocaleString()}</td>
-                <td className="p-3">
+                <td className="p-3 align-top">{u.total_slips_exported.toLocaleString()}</td>
+                <td className="p-3 align-top">{u.total_ai_runs.toLocaleString()}</td>
+                <td className="p-3 align-top">
                   {u.banned ? (
-                    <form action={setUserBannedAction}>
-                      <input type="hidden" name="user_id" value={u.id} />
-                      <input type="hidden" name="banned" value="false" />
-                      <button type="submit" className="text-xs px-2 py-1 rounded" style={{ background: "rgba(239,68,68,0.1)", color: "var(--error)" }}>Suspended · unban</button>
-                    </form>
+                    <BanForm userId={u.id} banned={false} label="Suspended · unban" danger />
                   ) : u.id === me.id ? (
                     <span className="text-xs" style={{ color: "var(--text-muted)" }}>you</span>
+                  ) : u.role === "super_admin" ? (
+                    <span className="text-xs" style={{ color: "var(--text-muted)" }}>protected</span>
                   ) : (
-                    <form action={setUserBannedAction}>
-                      <input type="hidden" name="user_id" value={u.id} />
-                      <input type="hidden" name="banned" value="true" />
-                      <button type="submit" className="text-xs underline" style={{ color: "var(--text-muted)" }}>ban</button>
-                    </form>
+                    <BanForm userId={u.id} banned={true} label="ban" />
                   )}
                 </td>
               </tr>
@@ -95,6 +75,7 @@ export default async function AdminUsersPage() {
 
       <p className="text-xs mt-4" style={{ color: "var(--text-muted)" }}>
         Plan changes apply immediately. After confirming a WhatsApp payment, set the user&apos;s plan to <code>basic</code> or <code>standard</code> here.
+        {!isSuperAdmin && <span> Role changes are restricted to super-admins.</span>}
       </p>
     </div>
   );

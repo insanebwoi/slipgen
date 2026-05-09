@@ -56,17 +56,27 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (isAdmin && user) {
+  // Banned users (and admin/role checks) hit profiles in one query for both /editor and /admin.
+  if ((isProtected || isAdmin) && user) {
     const { data: profile } = await supabase
       .from("profiles")
       .select("role, banned")
       .eq("id", user.id)
       .single();
 
-    if (!profile || profile.banned || profile.role !== "admin") {
+    if (profile?.banned) {
       const url = request.nextUrl.clone();
-      url.pathname = profile?.banned ? "/banned" : "/";
+      url.pathname = "/banned";
       return NextResponse.redirect(url);
+    }
+
+    if (isAdmin) {
+      const isAdminRole = profile?.role === "admin" || profile?.role === "super_admin";
+      if (!profile || !isAdminRole) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/";
+        return NextResponse.redirect(url);
+      }
     }
   }
 
@@ -74,6 +84,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Run on app routes; skip Next internals, static assets, and the AI proxy route.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/ai-process|.*\\.(?:png|svg|jpg|jpeg|webp)$).*)"],
+  // Run on app routes; skip Next internals and static assets.
+  // /api/ai-process IS included so the session cookie gets refreshed before the route handler runs.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|svg|jpg|jpeg|webp)$).*)"],
 };

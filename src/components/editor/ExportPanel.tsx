@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useSlipGenStore } from "@/lib/store";
-import { ArrowLeft, Download, FileText, Image, Loader2, CheckCircle2, Printer, Lock } from "lucide-react";
+import { ArrowLeft, Download, FileText, Image as ImageIcon, Loader2, CheckCircle2, Lock } from "lucide-react";
 
 export default function ExportPanel() {
   const { students, selectedTemplate, layoutConfig, layoutResult, setStep, isExporting, setIsExporting } = useSlipGenStore();
@@ -20,8 +20,7 @@ export default function ExportPanel() {
       const { default: jsPDF } = await import("jspdf");
       const { toPng } = await import("html-to-image");
 
-      const paperW = layoutResult.slipWidth;
-      const paperH = layoutResult.slipHeight;
+
 
       // Get the preview element
       const previewEl = document.getElementById("layout-preview-canvas");
@@ -131,7 +130,7 @@ export default function ExportPanel() {
             }`}
             style={exportFormat === "png" ? { background: "rgba(99,102,241,0.15)" } : { background: "var(--surface)" }}
           >
-            <Image className="w-4 h-4" /> PNG
+            <ImageIcon className="w-4 h-4" /> PNG
           </button>
         </div>
       </div>

@@ -74,6 +74,7 @@ export interface LayoutConfig {
   margin: number;
   gap: number;
   copies: number;
+  autoFillPage: boolean;
   showCropMarks: boolean;
   showBleedMargin: boolean;
   bleedMargin: number;
