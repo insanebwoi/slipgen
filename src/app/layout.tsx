@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Inter, Outfit, Roboto } from "next/font/google";
 import "./globals.css";
 import AuthBoot from "@/components/AuthBoot";
 
@@ -12,6 +12,13 @@ const inter = Inter({
 const outfit = Outfit({
   variable: "--font-outfit",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const roboto = Roboto({
+  variable: "--font-roboto",
+  subsets: ["latin"],
+  weight: ["400", "500", "700", "900"],
   display: "swap",
 });
 
@@ -34,7 +41,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${outfit.variable} ${roboto.variable}`} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col">
         <AuthBoot />
         {children}

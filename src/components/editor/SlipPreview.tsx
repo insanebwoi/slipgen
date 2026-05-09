@@ -174,19 +174,19 @@ function AutoText({ text, targetLen, baseSize, color, weight, style, className }
   return <p className={className} style={{ ...style, fontSize: baseSize * scale, fontWeight: weight, color, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", lineHeight: style?.lineHeight || 1.2 }}>{str || " "}</p>;
 }
 
-function FieldLine({ label, value, f, color, lineColor }: { label: string; value: string; f: number; color: string; lineColor: string }) {
+function FieldLine({ label, value, f, color, lineColor, fm }: { label: string; value: string; f: number; color: string; lineColor: string; fm?: string }) {
   const str = (value || " ").trim();
   const len = Math.max(3, str.length);
   const scale = len > 10 ? Math.max(0.45, 10 / len) : 1;
   return (
-    <div className="flex items-baseline" style={{ borderBottom: `1px solid ${lineColor}`, paddingBottom: Math.max(1, f*0.15), gap: f*0.25 }}>
+    <div className="flex items-baseline" style={{ borderBottom: `1px solid ${lineColor}`, paddingBottom: Math.max(1, f*0.15), gap: f*0.25, fontFamily: fm }}>
       <span style={{ fontSize: f*0.82, fontWeight: 500, color, whiteSpace: "nowrap" }}>{label}</span>
       <span style={{ flex: 1, fontSize: f * scale, fontWeight: 700, color: value ? "#1e293b" : "transparent", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{value || "."}</span>
     </div>
   );
 }
 
-function StdRoll({ std, divis, roll, f, color, lineColor }: { std: string; divis: string; roll: string; f: number; color: string; lineColor: string }) {
+function StdRoll({ std, divis, roll, f, color, lineColor, fm }: { std: string; divis: string; roll: string; f: number; color: string; lineColor: string; fm?: string }) {
   const sLen = Math.max(2, (std || " ").trim().length);
   const sScale = sLen > 5 ? Math.max(0.45, 5 / sLen) : 1;
   const dLen = Math.max(1, (divis || " ").trim().length);
@@ -194,7 +194,7 @@ function StdRoll({ std, divis, roll, f, color, lineColor }: { std: string; divis
   const rLen = Math.max(2, (roll || " ").trim().length);
   const rScale = rLen > 5 ? Math.max(0.45, 5 / rLen) : 1;
   return (
-    <div className="flex" style={{ gap: f*0.4 }}>
+    <div className="flex" style={{ gap: f*0.4, fontFamily: fm }}>
       <div className="flex-1 flex items-baseline" style={{ borderBottom: `1px solid ${lineColor}`, paddingBottom: Math.max(1,f*0.15), gap: f*0.2 }}>
         <span style={{ fontSize: f*0.82, fontWeight: 500, color, whiteSpace: "nowrap" }}>Class:</span>
         <span style={{ flex: 1, fontSize: f * sScale, fontWeight: 700, color: std ? "#1e293b" : "transparent", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{std || "."}</span>
@@ -232,17 +232,17 @@ function T1_PlainPastel({ s, t, sc, wm, ci }: SP) {
   const seed = (ci + ((s.name||"a").charCodeAt(0) % cols.length)) % cols.length;
   const c = cols[seed];
   return (
-    <div className="relative overflow-hidden" style={{ width: w, height: h, borderRadius: r, background: c.bg, boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
+    <div className="relative overflow-hidden" style={{ width: w, height: h, borderRadius: r, background: c.bg, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", fontFamily: t.fontFamily }}>
       <div className="absolute inset-0 flex" style={{ padding: pad*0.6, zIndex: 1 }}>
         <div className="flex items-center justify-center" style={{ width: w*0.36 }}>
           <Pic url={s.aiImageUrl||s.imageUrl} size={ps} />
         </div>
         <div className="flex-1 flex items-center" style={{ paddingRight: pad*0.4 }}>
           <div className="w-full h-[88%] flex flex-col justify-between" style={{ background: "#fff", borderRadius: Math.max(4,sc*1.5), padding: `${pad*0.8}px ${pad}px`, boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
-            <AutoText text={s.name} targetLen={12} baseSize={nf} color={c.name} weight={600} style={{ letterSpacing: 0.3 }} />
-            <FieldLine label="Subject:" value={s.subject} f={ff} color={c.fld} lineColor={c.line} />
-            <StdRoll std={s.className} divis={s.division} roll={s.rollNo} f={ff} color={c.fld} lineColor={c.line} />
-            <AutoText text={s.schoolName} targetLen={22} baseSize={ff*0.85} color={c.accent} weight={700} />
+            <AutoText text={s.name} targetLen={12} baseSize={nf} color={c.name} weight={600} style={{ letterSpacing: 0.3, fontFamily: t.fontFamily }} />
+            <FieldLine label="Subject:" value={s.subject} f={ff} color={c.fld} lineColor={c.line} fm={t.fontFamily} />
+            <StdRoll std={s.className} divis={s.division} roll={s.rollNo} f={ff} color={c.fld} lineColor={c.line} fm={t.fontFamily} />
+            <AutoText text={s.schoolName} targetLen={22} baseSize={ff*0.85} color={c.accent} weight={700} style={{ fontFamily: t.fontFamily }} />
           </div>
         </div>
       </div>
@@ -269,7 +269,7 @@ function T2_LinePattern({ s, t, sc, wm, ci }: SP) {
   const c = cols[seed];
   const stripeSize = Math.max(4, sc*2);
   return (
-    <div className="relative overflow-hidden" style={{ width: w, height: h, borderRadius: r, background: c.base, boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
+    <div className="relative overflow-hidden" style={{ width: w, height: h, borderRadius: r, background: c.base, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", fontFamily: t.fontFamily }}>
       <div className="absolute inset-0" style={{ backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent ${stripeSize}px, ${c.stripe} ${stripeSize}px, ${c.stripe} ${stripeSize*2}px)` }} />
       <div className="absolute inset-0 flex" style={{ padding: pad*0.6, zIndex: 1 }}>
         <div className="flex items-center justify-center" style={{ width: w*0.36 }}>
@@ -277,10 +277,10 @@ function T2_LinePattern({ s, t, sc, wm, ci }: SP) {
         </div>
         <div className="flex-1 flex items-center" style={{ paddingRight: pad*0.4 }}>
           <div className="w-full h-[88%] flex flex-col justify-between" style={{ background: "rgba(255,255,255,0.95)", borderRadius: Math.max(4,sc*1.5), padding: `${pad*0.8}px ${pad}px`, boxShadow: "0 1px 4px rgba(0,0,0,0.06)", border: `1px solid ${c.border}` }}>
-            <AutoText text={s.name} targetLen={12} baseSize={nf} color={c.name} weight={600} style={{ letterSpacing: 0.3 }} />
-            <FieldLine label="Subject:" value={s.subject} f={ff} color="#64748b" lineColor={c.line} />
-            <StdRoll std={s.className} divis={s.division} roll={s.rollNo} f={ff} color="#64748b" lineColor={c.line} />
-            <AutoText text={s.schoolName} targetLen={22} baseSize={ff*0.85} color={c.accent} weight={700} />
+            <AutoText text={s.name} targetLen={12} baseSize={nf} color={c.name} weight={600} style={{ letterSpacing: 0.3, fontFamily: t.fontFamily }} />
+            <FieldLine label="Subject:" value={s.subject} f={ff} color="#64748b" lineColor={c.line} fm={t.fontFamily} />
+            <StdRoll std={s.className} divis={s.division} roll={s.rollNo} f={ff} color="#64748b" lineColor={c.line} fm={t.fontFamily} />
+            <AutoText text={s.schoolName} targetLen={22} baseSize={ff*0.85} color={c.accent} weight={700} style={{ fontFamily: t.fontFamily }} />
           </div>
         </div>
       </div>
@@ -321,7 +321,7 @@ function T3_CartoonFun({ s, t, sc, wm, ci }: SP) {
   const ps=Math.min(w*0.32, h*0.82), pad=Math.max(3,h*0.06);
   const nf=Math.max(7,h*0.13), ff=Math.max(5,h*0.08);
   return (
-    <div className="relative overflow-hidden" style={{ width: w, height: h, borderRadius: r, boxShadow: "0 2px 8px rgba(0,0,0,0.12)" }}>
+    <div className="relative overflow-hidden" style={{ width: w, height: h, borderRadius: r, boxShadow: "0 2px 8px rgba(0,0,0,0.12)", fontFamily: t.fontFamily }}>
       <img src={v.bg} alt="" className="absolute inset-0 w-full h-full object-cover" style={{ filter: "brightness(1.05) saturate(1.1)" }} />
       <div className="absolute inset-0" style={{ background: "rgba(255,255,255,0.08)" }} />
       <div className="absolute inset-0 flex" style={{ padding: pad*0.6, zIndex: 1 }}>
@@ -330,10 +330,10 @@ function T3_CartoonFun({ s, t, sc, wm, ci }: SP) {
         </div>
         <div className="flex-1 flex items-center" style={{ paddingRight: pad*0.4 }}>
           <div className="w-full h-[88%] flex flex-col justify-between" style={{ background: "rgba(255,255,255,0.92)", borderRadius: Math.max(4,sc*1.5), padding: `${pad*0.8}px ${pad}px`, boxShadow: "0 2px 8px rgba(0,0,0,0.08)", backdropFilter: "blur(4px)" }}>
-            <AutoText text={s.name} targetLen={12} baseSize={nf} color="#1e293b" weight={600} style={{ letterSpacing: 0.3 }} />
-            <FieldLine label="Subject:" value={s.subject} f={ff} color="#6b7280" lineColor="#d1d5db" />
-            <StdRoll std={s.className} divis={s.division} roll={s.rollNo} f={ff} color="#6b7280" lineColor="#d1d5db" />
-            <AutoText text={s.schoolName} targetLen={22} baseSize={ff*0.85} color={accent} weight={700} />
+            <AutoText text={s.name} targetLen={12} baseSize={nf} color="#1e293b" weight={600} style={{ letterSpacing: 0.3, fontFamily: t.fontFamily }} />
+            <FieldLine label="Subject:" value={s.subject} f={ff} color="#6b7280" lineColor="#d1d5db" fm={t.fontFamily} />
+            <StdRoll std={s.className} divis={s.division} roll={s.rollNo} f={ff} color="#6b7280" lineColor="#d1d5db" fm={t.fontFamily} />
+            <AutoText text={s.schoolName} targetLen={22} baseSize={ff*0.85} color={accent} weight={700} style={{ fontFamily: t.fontFamily }} />
           </div>
         </div>
       </div>
@@ -359,7 +359,7 @@ function T4_WavyPattern({ s, t, sc, wm, ci }: SP) {
   const seed = (ci + ((s.name||"a").charCodeAt(0) % cols.length)) % cols.length;
   const c = cols[seed];
   return (
-    <div className="relative overflow-hidden" style={{ width: w, height: h, borderRadius: r, background: c.bg, boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
+    <div className="relative overflow-hidden" style={{ width: w, height: h, borderRadius: r, background: c.bg, boxShadow: "0 2px 8px rgba(0,0,0,0.1)", fontFamily: t.fontFamily }}>
       {/* Wavy shapes using CSS */}
       <svg className="absolute inset-0 w-full h-full" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
         <path d={`M0,${h*0.7} C${w*0.25},${h*0.5} ${w*0.5},${h*0.9} ${w},${h*0.65} L${w},${h} L0,${h} Z`} fill={c.wave1} />
@@ -373,10 +373,10 @@ function T4_WavyPattern({ s, t, sc, wm, ci }: SP) {
         </div>
         <div className="flex-1 flex items-center" style={{ paddingRight: pad*0.4 }}>
           <div className="w-full h-[88%] flex flex-col justify-between" style={{ background: "rgba(255,255,255,0.92)", borderRadius: Math.max(4,sc*1.5), padding: `${pad*0.8}px ${pad}px`, boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
-            <AutoText text={s.name} targetLen={12} baseSize={nf} color={c.name} weight={600} style={{ letterSpacing: 0.3 }} />
-            <FieldLine label="Subject:" value={s.subject} f={ff} color="#6b7280" lineColor={c.line} />
-            <StdRoll std={s.className} divis={s.division} roll={s.rollNo} f={ff} color="#6b7280" lineColor={c.line} />
-            <AutoText text={s.schoolName} targetLen={22} baseSize={ff*0.85} color={c.accent} weight={700} />
+            <AutoText text={s.name} targetLen={12} baseSize={nf} color={c.name} weight={600} style={{ letterSpacing: 0.3, fontFamily: t.fontFamily }} />
+            <FieldLine label="Subject:" value={s.subject} f={ff} color="#6b7280" lineColor={c.line} fm={t.fontFamily} />
+            <StdRoll std={s.className} divis={s.division} roll={s.rollNo} f={ff} color="#6b7280" lineColor={c.line} fm={t.fontFamily} />
+            <AutoText text={s.schoolName} targetLen={22} baseSize={ff*0.85} color={c.accent} weight={700} style={{ fontFamily: t.fontFamily }} />
           </div>
         </div>
       </div>
