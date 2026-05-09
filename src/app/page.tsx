@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
   Printer,
@@ -39,13 +40,8 @@ export default function HomePage() {
 
       {/* ===== NAVBAR ===== */}
       <nav className="relative z-10 flex items-center justify-between px-6 md:px-12 py-5">
-        <div className="flex items-center gap-2">
-          <div
-            className="w-9 h-9 rounded-lg flex items-center justify-center"
-            style={{ background: "var(--gradient-primary)" }}
-          >
-            <Printer className="w-5 h-5 text-white" />
-          </div>
+        <div className="flex items-center gap-2.5">
+          <Image src="/brand/logo-color.svg" alt="SlipGen" width={32} height={32} priority />
           <span
             className="text-xl font-bold"
             style={{ fontFamily: "var(--font-display)" }}
@@ -557,7 +553,7 @@ export default function HomePage() {
         style={{ color: "var(--text-muted)", borderTop: "1px solid var(--border)" }}
       >
         <div className="flex items-center justify-center gap-2 mb-2">
-          <Printer className="w-4 h-4" style={{ color: "var(--primary)" }} />
+          <Image src="/brand/logo-color.svg" alt="" width={16} height={16} aria-hidden="true" />
           <span className="font-semibold" style={{ color: "var(--text-secondary)" }}>
             SlipGen
           </span>

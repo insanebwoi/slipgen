@@ -16,7 +16,7 @@ const QUALITY_PRESETS: Record<Quality, { label: string; jpegQuality: number; des
 };
 
 export default function ExportPanel() {
-  const { students, selectedTemplate, layoutConfig, layoutResult, setStep, isExporting, setIsExporting } = useSlipGenStore();
+  const { students, selectedTemplate, layoutConfig, layoutResult, setStep, isExporting, setIsExporting, userPlan } = useSlipGenStore();
   const [exportFormat, setExportFormat] = useState<"pdf" | "png">("pdf");
   const [exportDpi, setExportDpi] = useState(200);
   const [quality, setQuality] = useState<Quality>("high");
@@ -229,29 +229,66 @@ export default function ExportPanel() {
       <div className="mb-6">
         <label className="text-sm font-medium mb-2 block">Watermark</label>
         <div className="space-y-2">
-          <div className="flex items-center justify-between p-3 rounded-lg border border-[var(--primary)]" style={{ background: "rgba(99,102,241,0.1)" }}>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-[var(--primary)]" />
-              <span className="text-sm font-medium">SlipGen Logo</span>
-            </div>
-            <span className="text-xs font-semibold px-2 py-1 rounded" style={{ background: "var(--surface)", color: "var(--text-secondary)" }}>Free</span>
-          </div>
+          {userPlan === 'free' ? (
+            <>
+              {/* Free plan: SlipGen logo is active + WhatsApp upgrade options */}
+              <div className="flex items-center justify-between p-3 rounded-lg border border-[var(--primary)]" style={{ background: "rgba(99,102,241,0.1)" }}>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-[var(--primary)]" />
+                  <span className="text-sm font-medium">SlipGen Logo</span>
+                </div>
+                <span className="text-xs font-semibold px-2 py-1 rounded" style={{ background: "var(--surface)", color: "var(--text-secondary)" }}>Active</span>
+              </div>
 
-          <button onClick={() => alert("Upgrade to Basic Plan for ₹99 to remove watermark!")} className="w-full flex items-center justify-between p-3 rounded-lg border border-[var(--border)] transition-all hover:border-[var(--primary)] group" style={{ background: "var(--surface)" }}>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full border border-[var(--text-muted)] group-hover:border-[var(--primary)]" />
-              <span className="text-sm text-[var(--text-secondary)] group-hover:text-white">Remove Watermark</span>
-            </div>
-            <span className="text-xs font-semibold px-2 py-1 rounded flex items-center gap-1" style={{ background: "rgba(245, 158, 11, 0.1)", color: "var(--warning)" }}><Lock className="w-3 h-3" /> ₹99</span>
-          </button>
+              <a
+                href={`https://wa.me/919544464144?text=${encodeURIComponent("Hi! I'd like to upgrade my SlipGen plan to remove the watermark from my name slips.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-between p-3 rounded-lg border border-[var(--border)] transition-all hover:border-green-500 group"
+                style={{ background: "var(--surface)" }}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full border border-[var(--text-muted)] group-hover:border-green-500" />
+                  <span className="text-sm text-[var(--text-secondary)] group-hover:text-white">Remove Watermark</span>
+                </div>
+                <span className="text-xs font-semibold px-2 py-1 rounded flex items-center gap-1" style={{ background: "rgba(37, 211, 102, 0.1)", color: "#25D366" }}>
+                  💬 Upgrade
+                </span>
+              </a>
 
-          <button onClick={() => alert("Upgrade to Basic Plan for ₹99 to add your own watermark!")} className="w-full flex items-center justify-between p-3 rounded-lg border border-[var(--border)] transition-all hover:border-[var(--primary)] group" style={{ background: "var(--surface)" }}>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full border border-[var(--text-muted)] group-hover:border-[var(--primary)]" />
-              <span className="text-sm text-[var(--text-secondary)] group-hover:text-white">Add Custom Watermark</span>
-            </div>
-            <span className="text-xs font-semibold px-2 py-1 rounded flex items-center gap-1" style={{ background: "rgba(245, 158, 11, 0.1)", color: "var(--warning)" }}><Lock className="w-3 h-3" /> ₹99</span>
-          </button>
+              <a
+                href={`https://wa.me/919544464144?text=${encodeURIComponent("Hi! I'd like to upgrade my SlipGen plan to add my own custom watermark/logo on name slips.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-between p-3 rounded-lg border border-[var(--border)] transition-all hover:border-green-500 group"
+                style={{ background: "var(--surface)" }}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full border border-[var(--text-muted)] group-hover:border-green-500" />
+                  <span className="text-sm text-[var(--text-secondary)] group-hover:text-white">Add Custom Watermark</span>
+                </div>
+                <span className="text-xs font-semibold px-2 py-1 rounded flex items-center gap-1" style={{ background: "rgba(37, 211, 102, 0.1)", color: "#25D366" }}>
+                  💬 Upgrade
+                </span>
+              </a>
+            </>
+          ) : (
+            <>
+              {/* Basic / Standard: full watermark control — no upsells needed */}
+              <div className="flex items-center justify-between p-3 rounded-lg border border-[var(--success)]" style={{ background: "rgba(16, 185, 129, 0.08)" }}>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4" style={{ color: "var(--success)" }} />
+                  <span className="text-sm font-medium">Custom Watermark</span>
+                </div>
+                <span className="text-xs font-semibold px-2 py-1 rounded" style={{ background: "rgba(16, 185, 129, 0.15)", color: "var(--success)" }}>
+                  {userPlan.charAt(0).toUpperCase() + userPlan.slice(1)} Plan
+                </span>
+              </div>
+              <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                Manage your watermark settings in the Layout step.
+              </p>
+            </>
+          )}
         </div>
       </div>
 

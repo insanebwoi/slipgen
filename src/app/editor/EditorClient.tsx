@@ -80,10 +80,20 @@ export default function EditorClient({ serverPlan }: { serverPlan: UserPlan }) {
         </div>
       </header>
 
-      <div className="relative z-10 flex-1 flex">
+      <div className="relative z-10 flex-1 flex flex-col lg:flex-row">
+        {/* Mobile preview: shown at top on small screens */}
+        <div className="lg:hidden w-full overflow-auto" style={{ background: "var(--surface)", maxHeight: "40vh", borderBottom: "1px solid var(--border)" }}>
+          <div className="p-4">
+            <SlipPreview />
+          </div>
+        </div>
+
+        {/* Controls panel */}
         <div className="w-full lg:w-[420px] xl:w-[480px] flex-shrink-0 overflow-y-auto p-5" style={{ borderRight: "1px solid var(--border)", maxHeight: "calc(100vh - 57px)" }}>
           <div className="animate-fade-in">{renderStep()}</div>
         </div>
+
+        {/* Desktop preview: side panel on large screens */}
         <div className="hidden lg:flex flex-1 items-center justify-center p-8 overflow-auto" style={{ background: "var(--surface)", maxHeight: "calc(100vh - 57px)" }}>
           <SlipPreview />
         </div>
