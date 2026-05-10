@@ -15,6 +15,13 @@ const QUALITY_PRESETS: Record<Quality, { label: string; jpegQuality: number; des
   lossless:   { label: "Lossless",   jpegQuality: 1.0,  description: "Largest file · pixel-perfect PNG",   usePng: true  },
 };
 
+// Mobile WebKit (iOS Safari, in-app browsers) struggles with very large canvases.
+// Cap effective DPI there to avoid silent OOM aborts that surface as a generic export failure.
+const isMobileWebKit = () => {
+  if (typeof navigator === "undefined") return false;
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+};
+
 export default function ExportPanel() {
   const { students, selectedTemplate, layoutConfig, layoutResult, setStep, isExporting, setIsExporting, userPlan } = useSlipGenStore();
   const [exportFormat, setExportFormat] = useState<"pdf" | "png">("pdf");
@@ -22,12 +29,14 @@ export default function ExportPanel() {
   const [quality, setQuality] = useState<Quality>("high");
   const [exported, setExported] = useState(false);
   const [lastFileSize, setLastFileSize] = useState<number | null>(null);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   const handleExport = useCallback(async () => {
     if (!selectedTemplate || !layoutResult) return;
     setIsExporting(true);
     setExported(false);
     setLastFileSize(null);
+    setExportError(null);
 
     try {
       const { default: jsPDF } = await import("jspdf");
@@ -39,22 +48,66 @@ export default function ExportPanel() {
         if (el.offsetWidth > 0 && el.offsetHeight > 0) { previewEl = el; break; }
       }
       if (!previewEl) {
-        alert("Preview not found. Please ensure the preview is visible.");
+        setExportError("Preview is not visible. Scroll to it or open the fullscreen preview, then try again.");
         setIsExporting(false);
         return;
       }
 
       const preset = QUALITY_PRESETS[quality];
+      // Mobile WebKit caps single canvases at ~16M pixels and rejects bigger ones silently.
+      // 150 DPI on A4 = 1241×1755 ≈ 2.1MP, well under the limit and visually fine for cartoon slips.
+      const effectiveDpi = isMobileWebKit() ? Math.min(exportDpi, 150) : exportDpi;
+
+      // The preview applies `transform: scale(zoom)` for on-screen sizing. We need the
+      // INTRINSIC (untransformed) size so the export captures the full document, not the
+      // shrunk view. offsetWidth/offsetHeight are unaffected by CSS transforms — perfect.
+      const fullW = previewEl.offsetWidth;
+      const fullH = previewEl.offsetHeight;
+
+      // Temporarily clear the transform on the source element during rasterization.
+      // html-to-image walks the live DOM, so an element with `transform: scale(0.5)`
+      // produces a half-size capture even if the clone overrides it. Removing the
+      // inline style from the source for the duration of the capture is the only
+      // reliable cross-browser way to get a 1:1 export.
+      const prevTransform = previewEl.style.transform;
+      const prevOrigin = previewEl.style.transformOrigin;
+      previewEl.style.transform = "none";
+      previewEl.style.transformOrigin = "top left";
+
       const captureOpts = {
-        pixelRatio: exportDpi / 96,
+        pixelRatio: effectiveDpi / 96,
         backgroundColor: "#ffffff",
-        cacheBust: false,
-        style: { transform: "scale(1)", transformOrigin: "top left" },
+        // cacheBust forces a re-fetch of <img src> so iOS doesn't taint the canvas
+        // with a half-loaded cached resource (the most common mobile failure mode).
+        cacheBust: true,
+        // Pin width/height to the intrinsic size, not the scaled rect.
+        width: fullW,
+        height: fullH,
+        style: { transform: "none", transformOrigin: "top left" },
       };
 
-      const imgData = preset.usePng
-        ? await toPng(previewEl, captureOpts)
-        : await toJpeg(previewEl, { ...captureOpts, quality: preset.jpegQuality });
+      // iOS/Safari workaround: html-to-image's first call frequently misses fonts/images
+      // because the SVG-foreignObject pipeline hasn't loaded resources yet. Calling twice
+      // and discarding the first result is the documented fix.
+      const rasterize = async () => preset.usePng
+        ? await toPng(previewEl!, captureOpts)
+        : await toJpeg(previewEl!, { ...captureOpts, quality: preset.jpegQuality });
+
+      let imgData: string | null = null;
+      try {
+        if (isMobileWebKit()) {
+          await rasterize().catch(() => null); // pre-warm; ignore errors
+        }
+        imgData = await rasterize();
+      } finally {
+        // Always restore the on-screen transform, even if rasterize threw.
+        previewEl.style.transform = prevTransform;
+        previewEl.style.transformOrigin = prevOrigin;
+      }
+
+      if (!imgData || imgData.length < 100) {
+        throw new Error("Renderer produced an empty image. Reload the page and try again.");
+      }
 
       const imageMime = preset.usePng ? "PNG" : "JPEG";
       const fileName = students.length > 0
@@ -122,7 +175,12 @@ export default function ExportPanel() {
       setExported(true);
     } catch (err) {
       console.error("Export failed:", err);
-      alert("Export failed. Please try again.");
+      const msg = err instanceof Error ? err.message : String(err);
+      setExportError(
+        isMobileWebKit()
+          ? `Export failed on mobile: ${msg}. Try lowering quality to "Compressed" and DPI to 150, or use a desktop browser for large pages.`
+          : `Export failed: ${msg}`,
+      );
     } finally {
       setIsExporting(false);
     }
@@ -333,6 +391,12 @@ export default function ExportPanel() {
         <p className="text-xs text-center mb-3" style={{ color: "var(--text-muted)" }}>
           File size: <span className="font-semibold" style={{ color: "var(--success)" }}>{formatBytes(lastFileSize)}</span>
         </p>
+      )}
+
+      {exportError && (
+        <div className="p-3 rounded-lg text-xs mb-3" style={{ background: "rgba(239,68,68,0.08)", color: "var(--error)", border: "1px solid rgba(239,68,68,0.2)" }}>
+          {exportError}
+        </div>
       )}
 
       {exported && (

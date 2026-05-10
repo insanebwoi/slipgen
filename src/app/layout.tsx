@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Outfit, Roboto } from "next/font/google";
+import { Inter, Outfit, Roboto, Bebas_Neue } from "next/font/google";
 import "./globals.css";
 import AuthBoot from "@/components/AuthBoot";
 
@@ -22,6 +22,14 @@ const roboto = Roboto({
   display: "swap",
 });
 
+// Manga/poster face used by the Anime Manga Panel template.
+const bebas = Bebas_Neue({
+  variable: "--font-bebas",
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "SlipGen — Smart Student Name Slip Generator",
   description:
@@ -41,7 +49,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable} ${roboto.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${outfit.variable} ${roboto.variable} ${bebas.variable}`} suppressHydrationWarning>
       <body className="min-h-screen flex flex-col">
         <AuthBoot />
         {children}
