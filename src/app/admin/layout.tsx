@@ -3,7 +3,12 @@ import { requireAdmin } from "@/lib/supabase/auth";
 import { signOutAction } from "../login/actions";
 import { Shield, Users, BarChart3, ArrowLeft } from "lucide-react";
 
-export const metadata = { title: "Admin — SlipGen" };
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Admin",
+  robots: { index: false, follow: false, nocache: true },
+};
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const profile = await requireAdmin();

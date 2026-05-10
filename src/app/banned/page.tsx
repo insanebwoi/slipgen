@@ -1,6 +1,10 @@
+import type { Metadata } from "next";
 import { signOutAction } from "../login/actions";
 
-export const metadata = { title: "Account suspended — SlipGen" };
+export const metadata: Metadata = {
+  title: "Account suspended",
+  robots: { index: false, follow: false, nocache: true },
+};
 
 export default function BannedPage() {
   return (
