@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSlipGenStore } from "@/lib/store";
 import { PAPER_SIZES, Student, Template, WatermarkConfig } from "@/types";
 import { getPassionTheme } from "@/lib/templates";

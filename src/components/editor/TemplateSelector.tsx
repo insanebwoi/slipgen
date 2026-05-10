@@ -41,6 +41,7 @@ const descriptions: Record<string, string> = {
   "space":       "Cosmic deep-space • Ringed planet photo • Constellation • Shooting star",
   "football":    "Stadium pitch • Kit colors • Jersey number • Captain's armband",
   "retro-y2k":   "💿 Chrome • Glitter sparkles • Pixel border • Holographic shimmer",
+  "anime-card":  "TCG style • 5 Rarity levels • Power levels • Special moves",
 };
 
 function TemplateCard({ template, isSelected, onSelect }: { template: Template; isSelected: boolean; onSelect: () => void }) {
@@ -76,6 +77,28 @@ function MiniPreview({ template }: { template: Template }) {
       {template.id === "space" && <ThumbSpace />}
       {template.id === "football" && <ThumbFootball />}
       {template.id === "retro-y2k" && <ThumbRetroY2K />}
+      {template.id === "anime-card" && <ThumbAnimeCard />}
+    </div>
+  );
+}
+
+function ThumbAnimeCard() {
+  return (
+    <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, #fbbf24 0%, #b45309 100%)", padding: 1.5 }}>
+      <div className="absolute inset-0 flex p-1 gap-1" style={{ background: "#fffbeb", margin: 1.5, border: "0.5px solid #444" }}>
+        <div style={{ width: "35%", background: "white", border: "1px solid #daa520", borderRadius: 1 }} />
+        <div className="flex-1 flex flex-col gap-[2px] justify-between py-0.5">
+          <div style={{ height: 4, width: "90%", background: "#111", borderRadius: 0.5 }} />
+          <div className="flex gap-1">
+            <div style={{ height: 3, width: "30%", background: "#b45309", borderRadius: 0.5 }} />
+            <div style={{ height: 3, width: "30%", background: "#b45309", borderRadius: 0.5 }} />
+          </div>
+          <div style={{ flex: 1, background: "rgba(0,0,0,0.05)", border: "0.5px dashed rgba(0,0,0,0.1)", borderRadius: 0.5 }} />
+        </div>
+      </div>
+      <div className="absolute bottom-1 right-1 flex gap-[0.5px]">
+         {[1,2,3].map(i => <div key={i} style={{ fontSize: 4 }}>★</div>)}
+      </div>
     </div>
   );
 }
