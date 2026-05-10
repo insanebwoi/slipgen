@@ -64,6 +64,29 @@ export default function ExportPanel() {
       const fullW = previewEl.offsetWidth;
       const fullH = previewEl.offsetHeight;
 
+      // ===== Pre-load every <img> inside the preview before rasterization. =====
+      // The "[object Event]" rejection from html-to-image is an <img>.onerror Event,
+      // which fires when an embedded image hasn't finished decoding when the
+      // SVG-foreignObject pipeline tries to read it. iOS Safari is especially picky
+      // with large data: URIs (AI student photos). Awaiting decode() here means we
+      // only call html-to-image when every image is guaranteed-ready.
+      const imgs = Array.from(previewEl.querySelectorAll("img"));
+      await Promise.all(imgs.map(async (img) => {
+        try {
+          if (img.complete && img.naturalWidth > 0) return;
+          // decode() is the modern, well-supported way to await full decoding.
+          if (typeof img.decode === "function") {
+            await img.decode().catch(() => {/* fall through to event-based wait */});
+            if (img.complete && img.naturalWidth > 0) return;
+          }
+          await new Promise<void>((resolve) => {
+            const done = () => resolve();
+            img.addEventListener("load", done, { once: true });
+            img.addEventListener("error", done, { once: true }); // resolve on error too — we don't want to hang the export
+          });
+        } catch { /* ignore — capture will continue without this image */ }
+      }));
+
       // Temporarily clear the transform on the source element during rasterization.
       // html-to-image walks the live DOM, so an element with `transform: scale(0.5)`
       // produces a half-size capture even if the clone overrides it. Removing the
@@ -77,13 +100,21 @@ export default function ExportPanel() {
       const captureOpts = {
         pixelRatio: effectiveDpi / 96,
         backgroundColor: "#ffffff",
-        // cacheBust forces a re-fetch of <img src> so iOS doesn't taint the canvas
-        // with a half-loaded cached resource (the most common mobile failure mode).
-        cacheBust: true,
+        // IMPORTANT: cacheBust must be FALSE. It appends "?t=…" to every <img src>,
+        // which mangles data: URIs (AI student photos) and triggers the
+        // "[object Event]" failure on mobile. Leave caching to the browser.
+        cacheBust: false,
         // Pin width/height to the intrinsic size, not the scaled rect.
         width: fullW,
         height: fullH,
         style: { transform: "none", transformOrigin: "top left" },
+        // Skip any <img> that fails to load instead of rejecting the whole export.
+        // Most failures are transient; better to ship a near-perfect export than nothing.
+        imagePlaceholder:
+          "data:image/svg+xml;utf8," +
+          encodeURIComponent(
+            "<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><rect width='10' height='10' fill='%23eeeeee'/></svg>",
+          ),
       };
 
       // iOS/Safari workaround: html-to-image's first call frequently misses fonts/images
@@ -175,10 +206,17 @@ export default function ExportPanel() {
       setExported(true);
     } catch (err) {
       console.error("Export failed:", err);
-      const msg = err instanceof Error ? err.message : String(err);
+      // Extract a useful message. html-to-image rejects with raw <img>.onerror Events
+      // when an embedded image fails to decode — those would render as "[object Event]"
+      // via the default String() coercion, which is useless to the user.
+      const msg =
+        err instanceof Error ? err.message :
+        err instanceof Event  ? "An image inside the preview failed to load (likely a student photo). Try removing AI photos and re-export." :
+        typeof err === "string" ? err :
+        "Unknown error";
       setExportError(
         isMobileWebKit()
-          ? `Export failed on mobile: ${msg}. Try lowering quality to "Compressed" and DPI to 150, or use a desktop browser for large pages.`
+          ? `Export failed on mobile: ${msg}`
           : `Export failed: ${msg}`,
       );
     } finally {
