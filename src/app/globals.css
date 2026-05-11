@@ -431,3 +431,30 @@ select.input-field {
 .tooltip:hover::after {
   opacity: 1;
 }
+
+/* Sticky bottom action bar (mobile only). Used by every editor step so the
+   primary navigation buttons stay reachable without scrolling. Desktop reverts
+   to inline flow so the layout stays unchanged on wide screens. */
+.step-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+@media (max-width: 1023px) {
+  .step-actions {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    /* Pull out of the parent's px-5 padding so the bar spans edge-to-edge */
+    margin-left: -1.25rem;
+    margin-right: -1.25rem;
+    margin-top: 0.5rem;
+    padding: 0.75rem 1.25rem calc(0.75rem + env(safe-area-inset-bottom)) 1.25rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    /* Soft fade so content disappearing behind it reads cleanly */
+    box-shadow: 0 -8px 16px -8px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(8px);
+  }
+}

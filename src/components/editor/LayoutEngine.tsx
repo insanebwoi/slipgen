@@ -355,7 +355,7 @@ export default function LayoutEngine() {
       )}
 
       {/* Navigation */}
-      <div className="flex gap-3">
+      <div className="step-actions">
         <button onClick={() => setStep("template")} className="btn-secondary flex-1 flex items-center justify-center gap-2">
           <ArrowLeft className="w-4 h-4" /> Back
         </button>

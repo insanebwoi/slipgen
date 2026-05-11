@@ -218,7 +218,7 @@ export default function StudentForm() {
             )}
           </div>
 
-          <div className="flex gap-2">
+          <div className="step-actions">
             <button onClick={() => { setIsAdding(false); setForm({ name: "", className: "", schoolName: form.schoolName }); setPreviewImage(null); setImageFile(null); }} className="btn-secondary flex-1 text-sm py-2.5">Cancel</button>
             <button onClick={handleAdd} disabled={!form.name.trim()} className="btn-primary flex-1 text-sm py-2.5 disabled:opacity-40 disabled:cursor-not-allowed">Add Student</button>
           </div>
@@ -229,10 +229,12 @@ export default function StudentForm() {
         </button>
       )}
 
-      {students.length > 0 && (
-        <button onClick={() => setStep("ai-process")} className="btn-primary w-full mt-5 flex items-center justify-center gap-2">
-          AI Magic ✨ <ArrowRight className="w-4 h-4" />
-        </button>
+      {students.length > 0 && !isAdding && (
+        <div className="step-actions" style={{ marginTop: "1.25rem" }}>
+          <button onClick={() => setStep("ai-process")} className="btn-primary w-full flex items-center justify-center gap-2">
+            AI Magic ✨ <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
       )}
     </div>
   );

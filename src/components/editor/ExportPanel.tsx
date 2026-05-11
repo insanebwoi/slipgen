@@ -434,21 +434,6 @@ export default function ExportPanel() {
         </div>
       </div>
 
-      {/* Export Button */}
-      <button
-        onClick={handleExport}
-        disabled={isExporting || !layoutResult}
-        className="btn-primary w-full flex items-center justify-center gap-2 py-3.5 mb-2 disabled:opacity-50"
-      >
-        {isExporting ? (
-          <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</>
-        ) : exported ? (
-          <><CheckCircle2 className="w-4 h-4" /> Exported Successfully!</>
-        ) : (
-          <><Download className="w-4 h-4" /> Export {exportFormat.toUpperCase()}</>
-        )}
-      </button>
-
       {lastFileSize !== null && (
         <p className="text-xs text-center mb-3" style={{ color: "var(--text-muted)" }}>
           File size: <span className="font-semibold" style={{ color: "var(--success)" }}>{formatBytes(lastFileSize)}</span>
@@ -461,15 +446,31 @@ export default function ExportPanel() {
         </div>
       )}
 
-      {exported && (
-        <button onClick={handleExport} className="btn-secondary w-full flex items-center justify-center gap-2 mb-4">
-          <Download className="w-4 h-4" /> Export Again
+      <div className="step-actions flex-col">
+        <button
+          onClick={handleExport}
+          disabled={isExporting || !layoutResult}
+          className="btn-primary w-full flex items-center justify-center gap-2 py-3.5 disabled:opacity-50"
+        >
+          {isExporting ? (
+            <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</>
+          ) : exported ? (
+            <><CheckCircle2 className="w-4 h-4" /> Exported Successfully!</>
+          ) : (
+            <><Download className="w-4 h-4" /> Export {exportFormat.toUpperCase()}</>
+          )}
         </button>
-      )}
 
-      <button onClick={() => setStep("layout")} className="btn-secondary w-full flex items-center justify-center gap-2">
-        <ArrowLeft className="w-4 h-4" /> Back to Layout
-      </button>
+        {exported && (
+          <button onClick={handleExport} className="btn-secondary w-full flex items-center justify-center gap-2">
+            <Download className="w-4 h-4" /> Export Again
+          </button>
+        )}
+
+        <button onClick={() => setStep("layout")} className="btn-secondary w-full flex items-center justify-center gap-2">
+          <ArrowLeft className="w-4 h-4" /> Back to Layout
+        </button>
+      </div>
     </div>
   );
 }
