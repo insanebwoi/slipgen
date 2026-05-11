@@ -1551,85 +1551,104 @@ function FootballStat({ label, value, f, text, accent, primary, fm, flex }: { la
 function T11_RetroY2K({ s, t, sc, wm, ci }: SP) {
   const w=t.width*sc, h=t.height*sc, r=Math.max(2, sc*0.5);
   const titleH = h * 0.12;
-  const F = "'Segoe UI', Tahoma, sans-serif";
+  const toolbarH = h * 0.14;
+  const addressH = h * 0.1;
+  const F = "Times New Roman, serif"; 
 
   return (
     <div className="relative overflow-hidden" style={{ 
       width: w, height: h, borderRadius: r, 
-      background: "#008080", // Classic Desktop Teal
-      padding: sc*1,
+      background: "#c0c0c0", 
+      border: `2px solid #fff`,
+      borderRightColor: "#000", borderBottomColor: "#000",
+      boxShadow: `1px 1px 0 #808080`,
       fontFamily: F 
     }}>
-      {/* Window Frame */}
-      <div className="relative w-full h-full flex flex-col" style={{ 
-        background: "#c0c0c0",
-        border: `1px solid #dfdfdf`,
-        borderRightColor: "#000", borderBottomColor: "#000",
-        boxShadow: `inset 1px 1px 0 #fff, 1px 1px 0 #808080`,
+      {/* Browser Title Bar */}
+      <div className="flex items-center justify-between" style={{ 
+        height: titleH, background: "linear-gradient(90deg, #000080, #1084d0)", margin: 1, padding: `0 ${sc*1}px`
       }}>
-        {/* Title Bar */}
-        <div className="flex items-center justify-between" style={{ 
-          height: titleH, background: "#000080", margin: 2, padding: `0 ${sc*1}px`
-        }}>
-          <span style={{ fontSize: titleH*0.5, color: "#fff", fontWeight: 700 }}>STUDENT.EXE PROPERTIES</span>
-          <WinButton sc={sc} size={titleH*0.75} color="#c0c0c0">×</WinButton>
+        <div className="flex items-center gap-1 overflow-hidden">
+          <span style={{ fontSize: titleH*0.6 }}>🌐</span>
+          <span style={{ fontSize: titleH*0.45, color: "#fff", fontWeight: 700, whiteSpace: "nowrap", textTransform: "uppercase" }}>
+            {s.schoolName.slice(0, 30)} - Browser 1.0
+          </span>
         </div>
+        <WinButton sc={sc} size={titleH*0.8} color="#c0c0c0">×</WinButton>
+      </div>
 
-        {/* Tabs */}
-        <div className="flex gap-0.5 px-2 pt-1" style={{ fontSize: h*0.045 }}>
-           <div style={{ 
-             background: "#c0c0c0", padding: `2px ${sc*2}px`, 
-             border: "1px solid #dfdfdf", borderBottom: "none",
-             borderRightColor: "#808080", borderRadius: "2px 2px 0 0",
-             fontWeight: 700
-           }}>General</div>
-           <div style={{ padding: `2px ${sc*2}px`, color: "#444" }}>Details</div>
-        </div>
+      {/* Toolbar Buttons */}
+      <div className="flex items-center gap-2 px-2 border-b border-[#808080]" style={{ height: toolbarH, background: "#c0c0c0" }}>
+         <div className="flex gap-1">
+            <WinBtn f={h*0.04}>⬅️ Back</WinBtn>
+            <WinBtn f={h*0.04}>➡️ Next</WinBtn>
+            <WinBtn f={h*0.04}>🏠 Home</WinBtn>
+         </div>
+         <div className="flex-1" />
+         <div style={{ width: sc*5, height: sc*5, background: "#fff", border: "1px solid #808080", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: h*0.04, fontWeight: 900 }}>N</div>
+      </div>
 
-        {/* Tab Content Box */}
-        <div className="flex-1 mx-1 mb-1 p-2 flex gap-3" style={{ 
-          background: "#c0c0c0", border: `1px solid #fff`, borderLeftColor: "#808080", borderTopColor: "#808080"
-        }}>
-           {/* Left Column: Icon & Small stats */}
-           <div className="flex flex-col gap-2 items-center" style={{ width: w*0.3 }}>
-              <div style={{ 
-                width: "100%", aspectRatio: "1/1", background: "#fff", 
-                border: "2px solid #808080", borderRightColor: "#fff", borderBottomColor: "#fff",
-                display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden"
-              }}>
-                 {(s.aiImageUrl || s.imageUrl)
-                  ? <img src={s.aiImageUrl || s.imageUrl!} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  : <User style={{ width: "50%", height: "50%", color: "#808080" }} />}
-              </div>
-              <div className="flex flex-col gap-1 w-full">
-                 <WinInput label="CLASS" value={s.className} f={h*0.06} center />
-                 <WinInput label="DIV" value={s.division} f={h*0.06} center />
-              </div>
-           </div>
+      {/* Address Bar */}
+      <div className="flex items-center gap-1 px-2 py-1 bg-[#c0c0c0] border-b border-[#808080]" style={{ height: addressH }}>
+         <span style={{ fontSize: h*0.04, fontWeight: 700, fontFamily: "sans-serif" }}>Location:</span>
+         <div style={{ 
+           flex: 1, background: "#fff", border: "1px solid #808080", 
+           boxShadow: "inset 1px 1px 1px rgba(0,0,0,0.2)",
+           padding: `0 4px`, fontSize: h*0.05, color: "#000",
+           display: "flex", alignItems: "center", overflow: "hidden", whiteSpace: "nowrap"
+         }}>
+           http://www.{s.schoolName.toLowerCase().replace(/[^a-z]/g, "")}.edu/id/{s.id.slice(0,6)}
+         </div>
+      </div>
 
-           {/* Right Column: Name & Subject */}
-           <div className="flex-1 flex flex-col gap-2 overflow-hidden">
-              <WinInput label="STUDENT NAME:" value={s.name} f={h*0.09} />
-              
-              <div className="flex-1 flex flex-col gap-1">
-                 <span style={{ fontSize: h*0.045, fontWeight: 700 }}>SUBJECT / SKILL:</span>
-                 <div style={{ 
-                   flex: 1, background: "#fff", border: "2px solid #808080", 
-                   borderRightColor: "#fff", borderBottomColor: "#fff",
-                   padding: `4px ${sc*1}px`, fontSize: h*0.12, fontWeight: 800, color: "#000",
-                   display: "flex", alignItems: "center"
-                 }}>
-                   {s.subject || ""}
-                 </div>
-              </div>
+      {/* Main Webpage Content */}
+      <div className="flex-1 overflow-hidden flex flex-col bg-white m-1" style={{ 
+        border: "1px solid #808080", boxShadow: "inset 1px 1px 2px rgba(0,0,0,0.1)"
+      }}>
+         {/* School Banner */}
+         <div className="text-center py-1 border-b-2 border-double border-blue-800" style={{ background: "#f0f0ff" }}>
+            <h2 style={{ fontSize: h*0.06, margin: 0, color: "#000080", letterSpacing: 0.5 }}>WELCOME TO {s.schoolName.toUpperCase()}</h2>
+         </div>
 
-              {/* Action Buttons */}
-              <div className="flex justify-end gap-1" style={{ paddingTop: 2 }}>
-                 <WinBtn f={h*0.045}>OK</WinBtn>
-                 <WinBtn f={h*0.045}>Cancel</WinBtn>
-              </div>
-           </div>
-        </div>
+         <div className="flex flex-1 overflow-hidden">
+            {/* Left: Profile Photo */}
+            <div className="p-2 border-r border-[#eee]" style={{ width: w*0.35 }}>
+               <div style={{ 
+                 width: "100%", aspectRatio: "1/1", border: "1px solid #000",
+                 padding: 2, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center"
+               }}>
+                  {(s.aiImageUrl || s.imageUrl)
+                   ? <img src={s.aiImageUrl || s.imageUrl!} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                   : <User style={{ width: "40%", height: "40%", color: "#ccc" }} />}
+               </div>
+               <div className="mt-1 text-center" style={{ fontSize: h*0.03, color: "#666" }}>User_Profile_v1.0</div>
+            </div>
+
+            {/* Right: Text Content */}
+            <div className="flex-1 p-2 flex flex-col gap-1.5 overflow-hidden">
+               <h1 style={{ fontSize: h*0.08, margin: 0, color: "#000", borderBottom: "1px solid #333", lineHeight: 1 }}>{s.name.toUpperCase()}</h1>
+               
+               <div className="flex flex-col gap-1" style={{ fontSize: h*0.05 }}>
+                  <div className="flex items-baseline gap-1">
+                     <span style={{ color: "#0000ee", textDecoration: "underline" }}>CLASS_LVL:</span>
+                     <span style={{ fontWeight: 700 }}>{s.className}</span>
+                  </div>
+                  <div className="flex items-baseline gap-1">
+                     <span style={{ color: "#0000ee", textDecoration: "underline" }}>DIV_SEC:</span>
+                     <span style={{ fontWeight: 700 }}>{s.division || "______"}</span>
+                  </div>
+                  <div className="flex items-baseline gap-1">
+                     <span style={{ color: "#0000ee", textDecoration: "underline" }}>ROLL_NUM:</span>
+                     <span style={{ fontWeight: 700 }}>#{s.rollNo}</span>
+                  </div>
+                  
+                  <div className="mt-1" style={{ borderTop: "1px solid #ccc", paddingTop: 1 }}>
+                     <span style={{ color: "#0000ee", textDecoration: "underline", display: "block", fontSize: h*0.03 }}>SPECIAL_SUBJECT:</span>
+                     <span style={{ fontSize: h*0.07, fontWeight: 900, color: "#aa0000" }}>{s.subject || "NO_DATA"}</span>
+                  </div>
+               </div>
+            </div>
+         </div>
       </div>
 
       <Wm w={w} h={h} wm={wm} />
