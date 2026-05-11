@@ -4,7 +4,8 @@
 import { useState, useRef } from "react";
 import { useSlipGenStore } from "@/lib/store";
 import { Student } from "@/types";
-import { Plus, Trash2, User, ArrowRight, Image as ImageIcon, X, ChevronDown, Pencil, Check } from "lucide-react";
+import { compressImageFile } from "@/lib/image-compress";
+import { Plus, Trash2, User, ArrowRight, Image as ImageIcon, X, ChevronDown, Pencil, Check, Loader2 } from "lucide-react";
 
 function generateId() {
   return Math.random().toString(36).substring(2, 15);
@@ -18,6 +19,8 @@ export default function StudentForm() {
   const [editForm, setEditForm] = useState({ name: "", className: "", schoolName: "" });
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [compressing, setCompressing] = useState(false);
+  const [compressedKB, setCompressedKB] = useState<number | null>(null);
   const [showSchoolDropdown, setShowSchoolDropdown] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const schoolInputRef = useRef<HTMLInputElement>(null);
@@ -32,7 +35,7 @@ export default function StudentForm() {
     };
     addStudent(student);
     setForm({ name: "", className: "", schoolName: form.schoolName });
-    setPreviewImage(null); setImageFile(null); setIsAdding(false);
+    setPreviewImage(null); setImageFile(null); setCompressedKB(null); setIsAdding(false);
   };
 
   const startEdit = (s: Student) => {
@@ -47,14 +50,27 @@ export default function StudentForm() {
     setEditingId(null);
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !file.type.startsWith("image/")) return;
-    if (file.size > 10 * 1024 * 1024) { alert("Image must be under 10MB"); return; }
+    if (file.size > 25 * 1024 * 1024) { alert("Image must be under 25 MB"); return; }
+    // Compress to ~50 KB before storing. Phone-camera photos are 5-15 MB which
+    // bloats the export DOM and reliably breaks html-to-image on iOS Safari.
     setImageFile(file);
-    const reader = new FileReader();
-    reader.onload = (ev) => setPreviewImage(ev.target?.result as string);
-    reader.readAsDataURL(file);
+    setCompressing(true);
+    setCompressedKB(null);
+    try {
+      const result = await compressImageFile(file, { targetBytes: 50 * 1024 });
+      setPreviewImage(result.dataUrl);
+      setCompressedKB(Math.round(result.bytes / 1024));
+    } catch {
+      // Compression failed — fall back to the raw file so the upload still works.
+      const fr = new FileReader();
+      fr.onload = (ev) => setPreviewImage(ev.target?.result as string);
+      fr.readAsDataURL(file);
+    } finally {
+      setCompressing(false);
+    }
   };
 
   const schoolSuggestions = schoolList.filter(
@@ -131,17 +147,29 @@ export default function StudentForm() {
           {/* Photo Upload */}
           <div className="mb-4">
             <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-            {previewImage ? (
-              <div className="relative w-20 h-20 rounded-xl overflow-hidden mx-auto mb-2">
-                <img src={previewImage} alt="Preview" className="w-full h-full object-cover" />
-                <button onClick={() => { setPreviewImage(null); setImageFile(null); }} className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "rgba(0,0,0,0.6)" }}>
-                  <X className="w-3 h-3" />
-                </button>
+            {compressing ? (
+              <div className="w-20 h-20 rounded-xl mx-auto mb-2 flex items-center justify-center" style={{ background: "var(--surface-hover)", border: "1px dashed var(--border)" }}>
+                <Loader2 className="w-5 h-5 animate-spin" style={{ color: "var(--primary)" }} />
+              </div>
+            ) : previewImage ? (
+              <div className="flex flex-col items-center gap-1 mb-2">
+                <div className="relative w-20 h-20 rounded-xl overflow-hidden">
+                  <img src={previewImage} alt="Preview" className="w-full h-full object-cover" />
+                  <button onClick={() => { setPreviewImage(null); setImageFile(null); setCompressedKB(null); }} className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "rgba(0,0,0,0.6)" }}>
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+                {compressedKB !== null && (
+                  <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>
+                    Optimised · <span style={{ color: "var(--success)" }}>{compressedKB} KB</span>
+                  </span>
+                )}
               </div>
             ) : (
               <button onClick={() => fileInputRef.current?.click()} className="w-full py-4 rounded-xl border-2 border-dashed flex flex-col items-center gap-1.5 transition-colors hover:border-[var(--primary)]" style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}>
                 <ImageIcon className="w-6 h-6" />
                 <span className="text-xs">Upload Photo (optional)</span>
+                <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>auto-compressed to ~50 KB</span>
               </button>
             )}
           </div>
