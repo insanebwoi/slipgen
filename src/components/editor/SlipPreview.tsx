@@ -57,8 +57,8 @@ export default function SlipPreview() {
 
   if (currentStep === "students" || currentStep === "ai-process" || currentStep === "template") {
     const previewStudent: Student = students[0] || {
-      id: "preview", name: "Student Name", className: "5th", division: "", rollNo: "", subject: "",
-      schoolName: "Your School", passion: "Doctor", gender: "child", imageUrl: null, imageFile: null,
+      id: "preview", name: "Student Name", className: "5th", division: "A", rollNo: "01", subject: "Mathematics",
+      schoolName: "Sample School", passion: "Scientist", gender: "child", imageUrl: null, imageFile: null,
       aiImageUrl: null, aiProcessing: false, aiProcessed: false,
     };
     return (
@@ -1544,114 +1544,237 @@ function FootballStat({ label, value, f, text, accent, primary, fm, flex }: { la
 }
 
 /* ============================================================
-   T11: RETRO WINDOWS 🌐 (Windows 95 / Netscape / Old Web)
-   Classic grey UI, blue title bar, beveled buttons,
-   pixelated icons, blue underlined links.
+   T11: RETRO WINDOWS 🌐 (Windows 95 desktop window aesthetic)
+   Grey OS chrome, blue title bar with min/max/close, menu bar,
+   sunken bevel form fields, status bar — every Student field
+   is displayed. Long names handled by SmartName, the rest
+   shrink by character count.
    ============================================================ */
-function T11_RetroY2K({ s, t, sc, wm, ci }: SP) {
-  const w=t.width*sc, h=t.height*sc, r=Math.max(2, sc*0.5);
-  const titleH = h * 0.12;
-  const toolbarH = h * 0.14;
-  const addressH = h * 0.1;
-  const F = "Times New Roman, serif"; 
+function T11_RetroY2K({ s, t, sc, wm }: SP) {
+  const w=t.width*sc, h=t.height*sc;
+
+  // Windows 95 grey palette
+  const GREY      = "#c0c0c0";  // 3D face
+  const GREY_DARK = "#808080";  // shadow
+  const WHITE_HL  = "#ffffff";  // highlight
+  const BLACK     = "#000000";
+  const TITLE_BG  = "#000080";  // classic Windows blue
+  const TITLE_FG  = "#ffffff";
+  const TEXT      = "#000000";
+  const LINK_BLUE = "#0000ff";
+
+  // Bevel thickness scales with the slip size so borders read at print size
+  // instead of vanishing on a 90mm card. Win95 used 2px bevels in 1×; we use
+  // a sc-derived value so the look stays consistent at any export DPI.
+  const B = Math.max(1.5, sc * 0.55);
+  const raised =
+    `inset ${B}px ${B}px 0 ${WHITE_HL},` +
+    `inset -${B}px -${B}px 0 ${GREY_DARK},` +
+    `inset ${B*2}px ${B*2}px 0 ${GREY},` +
+    `inset -${B*2}px -${B*2}px 0 ${BLACK}`;
+  const sunken =
+    `inset ${B}px ${B}px 0 ${GREY_DARK},` +
+    `inset -${B}px -${B}px 0 ${WHITE_HL},` +
+    `inset ${B*2}px ${B*2}px 0 ${BLACK},` +
+    `inset -${B*2}px -${B*2}px 0 ${GREY}`;
+
+  // Size hooks — bumped from earlier so chrome reads at slip size
+  const F      = "'MS Sans Serif', Tahoma, Geneva, Verdana, sans-serif";
+  const titleH = Math.max(14, h * 0.13);
+  const menuH  = Math.max(10, h * 0.09);
+  const statusH = Math.max(9, h * 0.08);
+  const pad    = Math.max(4, sc * 1.4);
+  const f      = Math.max(6, h * 0.085);   // base form font size
+  const sm     = Math.max(5, h * 0.062);   // small label
+  const nameH  = Math.max(9, h * 0.19);    // big name display
+
+  // Truncate window-title filename to avoid wrapping in the title bar
+  const fileName = `${(s.name || "Untitled").slice(0, 24)}.idn`;
 
   return (
-    <div className="relative overflow-hidden" style={{ 
-      width: w, height: h, borderRadius: r, 
-      background: "#c0c0c0", 
-      border: `2px solid #fff`,
-      borderRightColor: "#000", borderBottomColor: "#000",
-      boxShadow: `1px 1px 0 #808080`,
-      fontFamily: F 
+    <div className="relative overflow-hidden" style={{
+      width: w, height: h, background: GREY, color: TEXT, fontFamily: F,
+      boxShadow: raised, borderRadius: 0,
     }}>
-      {/* Browser Title Bar */}
-      <div className="flex items-center justify-between" style={{ 
-        height: titleH, background: "linear-gradient(90deg, #000080, #1084d0)", margin: 1, padding: `0 ${sc*1}px`
-      }}>
-        <div className="flex items-center gap-1 overflow-hidden">
-          <span style={{ fontSize: titleH*0.6 }}>🌐</span>
-          <span style={{ fontSize: titleH*0.45, color: "#fff", fontWeight: 700, whiteSpace: "nowrap", textTransform: "uppercase" }}>
-            {s.schoolName.slice(0, 30)} - Browser 1.0
+      {/* ===== TITLE BAR ===== */}
+      <div className="absolute top-0 left-0 right-0 flex items-center justify-between"
+        style={{
+          height: titleH,
+          background: `linear-gradient(90deg, ${TITLE_BG} 0%, #1084d0 100%)`,
+          padding: `0 ${pad*0.6}px`,
+          color: TITLE_FG,
+        }}>
+        <div className="flex items-center gap-1 min-w-0">
+          {/* Tiny pixel "document" icon */}
+          <svg width={titleH*0.7} height={titleH*0.7} viewBox="0 0 16 16" style={{ flexShrink: 0 }}>
+            <rect x="2" y="1" width="10" height="14" fill="#fff" stroke="#000" strokeWidth="0.5" />
+            <line x1="4" y1="4" x2="10" y2="4" stroke="#000" strokeWidth="0.5" />
+            <line x1="4" y1="6" x2="10" y2="6" stroke="#000" strokeWidth="0.5" />
+            <line x1="4" y1="8" x2="10" y2="8" stroke="#000" strokeWidth="0.5" />
+            <line x1="4" y1="10" x2="8"  y2="10" stroke="#000" strokeWidth="0.5" />
+          </svg>
+          <span style={{
+            fontSize: titleH*0.55, fontWeight: 700, letterSpacing: 0.3,
+            whiteSpace: "nowrap" as const, overflow: "hidden", textOverflow: "ellipsis",
+          }}>
+            {fileName} - Student Identity Slip
           </span>
         </div>
-        <WinButton sc={sc} size={titleH*0.8} color="#c0c0c0">×</WinButton>
+        {/* Min / Max / Close buttons */}
+        <div className="flex items-center gap-0.5" style={{ flexShrink: 0 }}>
+          <WinTitleBtn size={titleH*0.78} label="_" />
+          <WinTitleBtn size={titleH*0.78} label="▢" />
+          <WinTitleBtn size={titleH*0.78} label="✕" />
+        </div>
       </div>
 
-      {/* Toolbar Buttons */}
-      <div className="flex items-center gap-2 px-2 border-b border-[#808080]" style={{ height: toolbarH, background: "#c0c0c0" }}>
-         <div className="flex gap-1">
-            <WinBtn f={h*0.04}>⬅️ Back</WinBtn>
-            <WinBtn f={h*0.04}>➡️ Next</WinBtn>
-            <WinBtn f={h*0.04}>🏠 Home</WinBtn>
-         </div>
-         <div className="flex-1" />
-         <div style={{ width: sc*5, height: sc*5, background: "#fff", border: "1px solid #808080", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: h*0.04, fontWeight: 900 }}>N</div>
+      {/* ===== MENU BAR ===== */}
+      <div className="absolute left-0 right-0 flex items-center gap-3"
+        style={{ top: titleH, height: menuH, background: GREY, padding: `0 ${pad*0.8}px`,
+          borderBottom: `${B}px solid ${GREY_DARK}`, boxShadow: `inset 0 -${B}px 0 ${WHITE_HL}` }}>
+        {["File", "Edit", "View", "Insert", "Help"].map((label) => (
+          <span key={label} style={{ fontSize: menuH*0.7, fontWeight: 400, color: TEXT }}>
+            <u>{label.charAt(0)}</u>{label.slice(1)}
+          </span>
+        ))}
       </div>
 
-      {/* Address Bar */}
-      <div className="flex items-center gap-1 px-2 py-1 bg-[#c0c0c0] border-b border-[#808080]" style={{ height: addressH }}>
-         <span style={{ fontSize: h*0.04, fontWeight: 700, fontFamily: "sans-serif" }}>Location:</span>
-         <div style={{ 
-           flex: 1, background: "#fff", border: "1px solid #808080", 
-           boxShadow: "inset 1px 1px 1px rgba(0,0,0,0.2)",
-           padding: `0 4px`, fontSize: h*0.05, color: "#000",
-           display: "flex", alignItems: "center", overflow: "hidden", whiteSpace: "nowrap"
-         }}>
-           http://www.{s.schoolName.toLowerCase().replace(/[^a-z]/g, "")}.edu/id/{s.id.slice(0,6)}
-         </div>
-      </div>
+      {/* ===== CLIENT AREA ===== */}
+      <div className="absolute flex gap-1"
+        style={{
+          top: titleH + menuH + pad*0.4,
+          bottom: statusH + pad*0.4,
+          left: pad*0.6, right: pad*0.6,
+        }}>
 
-      {/* Main Webpage Content */}
-      <div className="flex-1 overflow-hidden flex flex-col bg-white m-1" style={{ 
-        border: "1px solid #808080", boxShadow: "inset 1px 1px 2px rgba(0,0,0,0.1)"
-      }}>
-         {/* School Banner */}
-         <div className="text-center py-1 border-b-2 border-double border-blue-800" style={{ background: "#f0f0ff" }}>
-            <h2 style={{ fontSize: h*0.06, margin: 0, color: "#000080", letterSpacing: 0.5 }}>WELCOME TO {s.schoolName.toUpperCase()}</h2>
-         </div>
+        {/* LEFT COLUMN — photo well + class/div/roll */}
+        <div className="flex flex-col gap-1" style={{ width: w*0.32 }}>
+          {/* Photo "well" — sunken bevel like a Windows picture frame */}
+          <div style={{
+            width: "100%", aspectRatio: "1/1", background: WHITE_HL,
+            boxShadow: sunken, overflow: "hidden", flexShrink: 0,
+          }}>
+            {(s.aiImageUrl || s.imageUrl) ? (
+              <img src={s.aiImageUrl || s.imageUrl!} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center" style={{ background: WHITE_HL }}>
+                <User style={{ width: "45%", height: "45%", color: GREY_DARK }} />
+              </div>
+            )}
+          </div>
 
-         <div className="flex flex-1 overflow-hidden">
-            {/* Left: Profile Photo */}
-            <div className="p-2 border-r border-[#eee]" style={{ width: w*0.35 }}>
-               <div style={{ 
-                 width: "100%", aspectRatio: "1/1", border: "1px solid #000",
-                 padding: 2, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center"
-               }}>
-                  {(s.aiImageUrl || s.imageUrl)
-                   ? <img src={s.aiImageUrl || s.imageUrl!} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                   : <User style={{ width: "40%", height: "40%", color: "#ccc" }} />}
-               </div>
-               <div className="mt-1 text-center" style={{ fontSize: h*0.03, color: "#666" }}>User_Profile_v1.0</div>
+          {/* Std (className) / Div / Roll input row */}
+          <WinInput label="Std"  value={s.className} f={sm} center />
+          <div className="flex gap-1">
+            <WinInput label="Div"  value={s.division} f={sm} flex={1} center />
+            <WinInput label="Roll" value={s.rollNo}   f={sm} flex={1} center />
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN — name + school + subject + passion + checkbox row */}
+        <div className="flex-1 flex flex-col gap-1 min-w-0">
+
+          {/* Big name display — sunken text field with bigger font; SmartName handles long names */}
+          <div>
+            <span style={{ fontSize: sm*0.85, fontWeight: 700, color: TEXT, display: "block", marginBottom: 1 }}>
+              <u>N</u>ame:
+            </span>
+            <div style={{ background: WHITE_HL, boxShadow: sunken, padding: `${pad*0.2}px ${pad*0.4}px` }}>
+              <SmartName
+                text={s.name || "Untitled"}
+                boxWidth={w*0.62}
+                boxHeight={nameH}
+                color={TEXT}
+                weight={700}
+                fontFamily={F}
+                letterSpacing={0}
+                textTransform="uppercase"
+              />
             </div>
+          </div>
 
-            {/* Right: Text Content */}
-            <div className="flex-1 p-2 flex flex-col gap-1.5 overflow-hidden">
-               <h1 style={{ fontSize: h*0.08, margin: 0, color: "#000", borderBottom: "1px solid #333", lineHeight: 1 }}>{s.name.toUpperCase()}</h1>
-               
-               <div className="flex flex-col gap-1" style={{ fontSize: h*0.05 }}>
-                  <div className="flex items-baseline gap-1">
-                     <span style={{ color: "#0000ee", textDecoration: "underline" }}>CLASS_LVL:</span>
-                     <span style={{ fontWeight: 700 }}>{s.className}</span>
-                  </div>
-                  <div className="flex items-baseline gap-1">
-                     <span style={{ color: "#0000ee", textDecoration: "underline" }}>DIV_SEC:</span>
-                     <span style={{ fontWeight: 700 }}>{s.division || "______"}</span>
-                  </div>
-                  <div className="flex items-baseline gap-1">
-                     <span style={{ color: "#0000ee", textDecoration: "underline" }}>ROLL_NUM:</span>
-                     <span style={{ fontWeight: 700 }}>#{s.rollNo}</span>
-                  </div>
-                  
-                  <div className="mt-1" style={{ borderTop: "1px solid #ccc", paddingTop: 1 }}>
-                     <span style={{ color: "#0000ee", textDecoration: "underline", display: "block", fontSize: h*0.03 }}>SPECIAL_SUBJECT:</span>
-                     <span style={{ fontSize: h*0.07, fontWeight: 900, color: "#aa0000" }}>{s.subject || "NO_DATA"}</span>
-                  </div>
-               </div>
+          {/* School */}
+          <WinInput label="School" value={s.schoolName || "(Unspecified)"} f={f*0.85} />
+
+          {/* Subject / Specialization — highlighted with a "field group" frame */}
+          <div style={{
+            background: GREY, padding: `${pad*0.4}px ${pad*0.5}px`,
+            boxShadow: raised,
+          }}>
+            <span style={{ fontSize: sm*0.85, fontWeight: 700, color: TEXT, display: "block", marginBottom: 2 }}>
+              <u>S</u>ubject / Specialization:
+            </span>
+            <div style={{ background: WHITE_HL, boxShadow: sunken, padding: `${pad*0.2}px ${pad*0.4}px`,
+              fontSize: f*1.05, fontWeight: 700, color: TEXT, whiteSpace: "nowrap" as const,
+              overflow: "hidden", textOverflow: "ellipsis" as const,
+            }}>
+              {s.subject || "—"}
             </div>
-         </div>
+          </div>
+
+          {/* Passion + checkbox row */}
+          <div className="flex items-end gap-2">
+            <div className="flex-1 min-w-0">
+              <WinInput
+                label="Future Path"
+                value={`${getPassionTheme(s.passion || "Other").icon} ${s.passion || "Undecided"}`}
+                f={sm}
+              />
+            </div>
+            <WinCheck label="Verified" checked={true} f={sm} />
+          </div>
+        </div>
+      </div>
+
+      {/* ===== STATUS BAR ===== */}
+      <div className="absolute left-0 right-0 bottom-0 flex items-center justify-between"
+        style={{
+          height: statusH, background: GREY, padding: `0 ${pad*0.6}px`,
+          borderTop: `1px solid ${WHITE_HL}`,
+          boxShadow: `inset 0 1px 0 ${GREY_DARK}`,
+        }}>
+        <span style={{ fontSize: statusH*0.65, color: TEXT, fontWeight: 400 }}>
+          ID: <span style={{ color: LINK_BLUE, textDecoration: "underline" }}>#{(s.id || "00000000").slice(0,8).toUpperCase()}</span>
+        </span>
+        <span style={{ fontSize: statusH*0.65, color: TEXT }}>
+          {s.aiProcessed ? "● AI Processed" : "○ Original"}
+        </span>
+        <span style={{ fontSize: statusH*0.65, color: TEXT, fontFamily: "monospace" }}>
+          SlipGen v2.0
+        </span>
       </div>
 
       <Wm w={w} h={h} wm={wm} />
+    </div>
+  );
+}
+
+/** Tiny Win95 title-bar control button (min / max / close). */
+function WinTitleBtn({ size, label }: { size: number; label: string }) {
+  return (
+    <div style={{
+      width: size, height: size,
+      background: "#c0c0c0",
+      boxShadow: "inset 1px 1px 0 #ffffff, inset -1px -1px 0 #808080",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      fontSize: size*0.6, fontWeight: 900, color: "#000",
+      fontFamily: "'MS Sans Serif', sans-serif",
+    }}>{label}</div>
+  );
+}
+
+function WizardInput({ label, value, f, flex, color, isBlank }: { label: string, value: string, f: number, flex?: number, color?: string, isBlank?: boolean }) {
+  return (
+    <div style={{ flex: flex || "none", display: "flex", flexDirection: "column", gap: 1 }}>
+       <span style={{ fontSize: f*0.5, fontWeight: 700, color: "#000", letterSpacing: 0.5 }}>{label}:</span>
+       <div style={{ 
+         background: isBlank ? "rgba(0,0,0,0.02)" : "#fff", 
+         border: "2px solid #808080", borderRightColor: "#fff", borderBottomColor: "#fff",
+         padding: "2px 4px", fontSize: f, fontWeight: 700, color: color || "#333",
+         minHeight: f * 1.3, display: "flex", alignItems: "center", overflow: "hidden"
+       }}>
+         {value || " "}
+       </div>
     </div>
   );
 }
@@ -1666,23 +1789,29 @@ function WinBtn({ children, f }: { children: React.ReactNode, f: number }) {
 }
 
 function WinInput({ label, value, f, flex, width, center }: { label: string, value: string, f: number, flex?: number, width?: number, center?: boolean }) {
+  // Bevel thickness scales off font size so the sunken border stays visible
+  // at any slip dimension. ~12% of font size is the Win95 visual ratio.
+  const b = Math.max(0.8, f * 0.16);
   return (
-    <div style={{ flex: flex || "none", width: width || "auto", display: "flex", flexDirection: "column", gap: 1 }}>
-       <span style={{ fontSize: f*0.5, fontWeight: 700, color: "#000", letterSpacing: 0.5 }}>{label}</span>
-       <div style={{ 
-         background: "#fff", 
-         border: `2px solid #808080`,
-         borderRightColor: "#fff", borderBottomColor: "#fff",
-         padding: `2px 4px`,
+    <div style={{ flex: flex || "none", width: width || "auto", display: "flex", flexDirection: "column", gap: f*0.1 }}>
+       <span style={{ fontSize: f*0.78, fontWeight: 700, color: "#000", letterSpacing: 0.3 }}>{label}:</span>
+       <div style={{
+         background: "#fff",
+         boxShadow:
+           `inset ${b}px ${b}px 0 #808080, ` +
+           `inset -${b}px -${b}px 0 #fff, ` +
+           `inset ${b*2}px ${b*2}px 0 #000, ` +
+           `inset -${b*2}px -${b*2}px 0 #c0c0c0`,
+         padding: `${f*0.22}px ${f*0.45}px`,
          fontSize: f,
          fontWeight: 700,
          color: "#000",
          textAlign: center ? "center" : "left",
-         whiteSpace: "nowrap",
+         whiteSpace: "nowrap" as const,
          overflow: "hidden",
-         textOverflow: "ellipsis",
-         minHeight: f * 1.2,
-         display: "flex", alignItems: "center", justifyContent: center ? "center" : "flex-start"
+         textOverflow: "ellipsis" as const,
+         minHeight: f * 1.35,
+         display: "flex", alignItems: "center", justifyContent: center ? "center" : "flex-start",
        }}>
          {value || ""}
        </div>
@@ -1691,19 +1820,23 @@ function WinInput({ label, value, f, flex, width, center }: { label: string, val
 }
 
 function WinCheck({ label, checked, f }: { label: string, checked: boolean, f: number }) {
+  const b = Math.max(0.8, f * 0.18);
   return (
-    <div className="flex items-center gap-0.5">
-       <div style={{ 
-         width: f*1.1, height: f*1.1, 
-         background: "#fff", 
-         border: `1px solid #000`,
-         boxShadow: "inset 1px 1px 0 #808080",
+    <div className="flex items-center" style={{ gap: f*0.25 }}>
+       <div style={{
+         width: f*1.25, height: f*1.25,
+         background: "#fff",
+         boxShadow:
+           `inset ${b}px ${b}px 0 #808080, ` +
+           `inset -${b}px -${b}px 0 #fff, ` +
+           `inset ${b*2}px ${b*2}px 0 #000, ` +
+           `inset -${b*2}px -${b*2}px 0 #c0c0c0`,
          display: "flex", alignItems: "center", justifyContent: "center",
-         fontSize: f, color: "#000", fontWeight: 900
+         fontSize: f*0.95, color: "#000", fontWeight: 900,
        }}>
          {checked ? "✓" : ""}
        </div>
-       <span style={{ fontSize: f*0.8, fontWeight: 700, color: "#000" }}>{label}</span>
+       <span style={{ fontSize: f*0.85, fontWeight: 700, color: "#000" }}>{label}</span>
     </div>
   );
 }

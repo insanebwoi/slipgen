@@ -15,12 +15,34 @@ const QUALITY_PRESETS: Record<Quality, { label: string; jpegQuality: number; des
   lossless:   { label: "Lossless",   jpegQuality: 1.0,  description: "Largest file · pixel-perfect PNG",   usePng: true  },
 };
 
-// Mobile WebKit (iOS Safari, in-app browsers) struggles with very large canvases.
-// Cap effective DPI there to avoid silent OOM aborts that surface as a generic export failure.
+// Mobile WebKit (iOS Safari, in-app browsers) historically struggled with very
+// large canvases, but with photos now pre-compressed at upload time the real
+// constraint is just the canvas pixel ceiling (~16 MP on iOS, ~64 MP on Android).
+// Detection is still useful for the pre-warm rasterize and Web Share fallback.
 const isMobileWebKit = () => {
   if (typeof navigator === "undefined") return false;
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 };
+const isIOS = () => {
+  if (typeof navigator === "undefined") return false;
+  return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+};
+
+// Compute the highest DPI that fits under the platform's max canvas size.
+// iOS: ~16.7M pixels (4096×4096 hard cap on older devices, looser on newer).
+// Android Chrome / desktop: effectively unlimited for our needs.
+// We back off in steps (300 → 250 → 200 → 150) until we land safely.
+function safeDpiFor(intrinsicWidthPx: number, intrinsicHeightPx: number, requestedDpi: number): number {
+  const maxPixels = isIOS() ? 16_000_000 : 64_000_000;
+  // intrinsic px is already at preview scale (96 DPI). Output px = intrinsic × (dpi/96).
+  const ratio = requestedDpi / 96;
+  const wantedPixels = intrinsicWidthPx * ratio * intrinsicHeightPx * ratio;
+  if (wantedPixels <= maxPixels) return requestedDpi;
+  // Scale DPI down to fit, rounded to the nearest 25 DPI step for predictability.
+  const fitRatio = Math.sqrt(maxPixels / (intrinsicWidthPx * intrinsicHeightPx));
+  const fittedDpi = Math.floor((fitRatio * 96) / 25) * 25;
+  return Math.max(150, fittedDpi); // never go below 150 even if memory-starved
+}
 
 export default function ExportPanel() {
   const { students, selectedTemplate, layoutConfig, layoutResult, setStep, isExporting, setIsExporting, userPlan } = useSlipGenStore();
@@ -54,15 +76,17 @@ export default function ExportPanel() {
       }
 
       const preset = QUALITY_PRESETS[quality];
-      // Mobile WebKit caps single canvases at ~16M pixels and rejects bigger ones silently.
-      // 150 DPI on A4 = 1241×1755 ≈ 2.1MP, well under the limit and visually fine for cartoon slips.
-      const effectiveDpi = isMobileWebKit() ? Math.min(exportDpi, 150) : exportDpi;
 
       // The preview applies `transform: scale(zoom)` for on-screen sizing. We need the
       // INTRINSIC (untransformed) size so the export captures the full document, not the
       // shrunk view. offsetWidth/offsetHeight are unaffected by CSS transforms — perfect.
       const fullW = previewEl.offsetWidth;
       const fullH = previewEl.offsetHeight;
+
+      // Pick the highest DPI that fits within the platform's canvas-pixel ceiling.
+      // Mobile now matches desktop quality whenever memory allows; only steps down
+      // automatically if the requested DPI would crash the canvas.
+      const effectiveDpi = safeDpiFor(fullW, fullH, exportDpi);
 
       // ===== Pre-load every <img> inside the preview before rasterization. =====
       // The "[object Event]" rejection from html-to-image is an <img>.onerror Event,
