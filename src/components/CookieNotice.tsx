@@ -15,13 +15,13 @@ export default function CookieNotice() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // Defer to next tick so SSR/CSR don't disagree on initial render.
     try {
       const ack = window.localStorage.getItem(STORAGE_KEY);
-      if (!ack) setVisible(true);
+      if (!ack) {
+        setTimeout(() => setVisible(true), 0);
+      }
     } catch {
-      // Private browsing / disabled storage — show once per session.
-      setVisible(true);
+      setTimeout(() => setVisible(true), 0);
     }
   }, []);
 

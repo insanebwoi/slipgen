@@ -15,7 +15,9 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
   // If the user lands here via /auth/callback?error=… show it.
   useEffect(() => {
     const err = searchParams.get("error");
-    if (err) setError(decodeURIComponent(err));
+    if (err) {
+      setTimeout(() => setError(decodeURIComponent(err)), 0);
+    }
   }, [searchParams]);
 
   function onSubmit(formData: FormData) {

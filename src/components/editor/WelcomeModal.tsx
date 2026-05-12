@@ -35,12 +35,14 @@ export default function WelcomeModal() {
     try {
       const seen = window.localStorage.getItem(STORAGE_KEY);
       if (!seen && students.length === 0) {
-        setVisible(true);
+        setTimeout(() => setVisible(true), 0);
       }
     } catch {
       // localStorage blocked (private browsing) — still show, but it'll re-show
       // next session. Acceptable trade-off.
-      if (students.length === 0) setVisible(true);
+      if (students.length === 0) {
+        setTimeout(() => setVisible(true), 0);
+      }
     }
     // We intentionally check students.length only on mount; if a returning user
     // has saved students load in, the modal stays dismissed even without the flag.

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -23,7 +24,7 @@ export default function TermsPage() {
       <p>
         {siteConfig.name} lets you generate print-ready student name slips with optimised layouts and optional AI photo cartoonisation.
         We provide the software; you provide the student data. You retain ownership of the data you enter — see the{" "}
-        <a href="/privacy">Privacy Policy</a> for how we handle it.
+        <Link href="/privacy">Privacy Policy</Link> for how we handle it.
       </p>
 
       <h2>2. Your account</h2>
@@ -37,7 +38,7 @@ export default function TermsPage() {
       <h2>3. Plans and payments</h2>
       <p>
         SlipGen offers a Free tier and paid tiers (Basic, Standard). Plan limits and pricing are shown on the{" "}
-        <a href="/#pricing">pricing section</a> of the home page. Paid plans are currently billed by direct payment via WhatsApp to the
+        <Link href="/#pricing">pricing section</Link> of the home page. Paid plans are currently billed by direct payment via WhatsApp to the
         operator; we will update this page when self-serve billing is available.
       </p>
       <ul>
