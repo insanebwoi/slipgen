@@ -4,7 +4,7 @@
 import { useEffect, useRef } from "react";
 import { useSlipGenStore, SLIPGEN_LOGO_URL } from "@/lib/store";
 import { PAPER_SIZES, PaperSize } from "@/types";
-import { ArrowLeft, ArrowRight, Ruler, Copy, Grid3X3, Scissors, AlertTriangle, Stamp, Upload, Lock } from "lucide-react";
+import { ArrowLeft, ArrowRight, Ruler, Copy, Grid3X3, Scissors, AlertTriangle, Stamp, Upload, Lock, Info } from "lucide-react";
 
 export default function LayoutEngine() {
   const { layoutConfig, setLayoutConfig, layoutResult, recalculateLayout, setStep, students, watermark, setWatermark, userPlan } = useSlipGenStore();
@@ -314,25 +314,25 @@ export default function LayoutEngine() {
               <p className="text-2xl font-bold gradient-text" style={{ fontFamily: "var(--font-display)" }}>
                 {layoutResult.totalSlips}
               </p>
-              <p className="text-xs" style={{ color: "var(--text-muted)" }}>Slips per page</p>
+              <StatLabel text="Slips per page" tooltip="How many slips fit on one sheet at the current size and margin settings. Higher = fewer sheets to print." />
             </div>
             <div>
               <p className="text-2xl font-bold" style={{ color: "var(--success)", fontFamily: "var(--font-display)" }}>
                 {(100 - layoutResult.wastePercentage).toFixed(1)}%
               </p>
-              <p className="text-xs" style={{ color: "var(--text-muted)" }}>Paper utilization</p>
+              <StatLabel text="Paper utilization" tooltip="Share of the sheet covered by slips. Higher utilization means less paper thrown away." />
             </div>
             <div>
               <p className="text-lg font-bold">
                 {layoutResult.cols} × {layoutResult.rows}
               </p>
-              <p className="text-xs" style={{ color: "var(--text-muted)" }}>Grid layout</p>
+              <StatLabel text="Grid layout" tooltip="Columns × rows in the auto-packed grid. The engine picks the orientation that fits the most slips." />
             </div>
             <div>
               <p className="text-lg font-bold" style={{ color: layoutResult.wastePercentage > 40 ? "var(--warning)" : "var(--success)" }}>
                 {layoutResult.wastePercentage.toFixed(1)}%
               </p>
-              <p className="text-xs" style={{ color: "var(--text-muted)" }}>Waste</p>
+              <StatLabel text="Waste" tooltip="Empty sheet area as a percentage. Try a different paper size or reduce margins to bring this down." />
             </div>
           </div>
           {layoutResult.wastePercentage > 40 && (
@@ -364,5 +364,25 @@ export default function LayoutEngine() {
         </button>
       </div>
     </div>
+  );
+}
+
+/** Caption label with an inline info-icon tooltip. Used for the Layout Analysis
+ *  stats so users can hover/focus to learn what each metric means. */
+function StatLabel({ text, tooltip }: { text: string; tooltip: string }) {
+  return (
+    <p className="text-xs inline-flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
+      <span>{text}</span>
+      <span
+        tabIndex={0}
+        role="img"
+        aria-label={tooltip}
+        data-tooltip={tooltip}
+        className="tooltip tooltip-multiline inline-flex items-center justify-center"
+        style={{ cursor: "help", color: "var(--text-muted)", outline: "none" }}
+      >
+        <Info className="w-3 h-3" />
+      </span>
+    </p>
   );
 }

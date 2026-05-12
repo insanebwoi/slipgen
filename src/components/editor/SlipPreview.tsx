@@ -81,19 +81,40 @@ export default function SlipPreview() {
       <div className="flex items-center justify-between w-full max-w-3xl px-4">
         <p className="text-xs font-medium uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>Print Layout — {layoutConfig.paperSize}</p>
         
-        <div className="flex items-center gap-1.5 bg-[var(--surface)] rounded-lg p-1 border shadow-sm" style={{ borderColor: 'var(--border)' }}>
-          <button onClick={handleZoomOut} className="p-1.5 hover:bg-black/5 dark:hover:bg-white/10 rounded transition-colors" style={{ color: 'var(--text-secondary)' }} title="Zoom Out">
-            <ZoomOut className="w-4 h-4" />
+        <div className="flex items-center gap-1.5 bg-[var(--surface)] rounded-lg p-1 border shadow-sm" style={{ borderColor: 'var(--border)' }} role="group" aria-label="Preview zoom">
+          <button
+            type="button"
+            onClick={handleZoomOut}
+            className="p-1.5 hover:bg-black/5 dark:hover:bg-white/10 rounded transition-colors"
+            style={{ color: 'var(--text-secondary)' }}
+            aria-label="Zoom out"
+            title="Zoom out"
+          >
+            <ZoomOut className="w-4 h-4" aria-hidden="true" />
           </button>
-          <span className="text-xs font-medium w-10 text-center" style={{ color: 'var(--text-secondary)' }}>
+          <span className="text-xs font-medium w-10 text-center" style={{ color: 'var(--text-secondary)' }} aria-live="polite" aria-atomic="true">
             {Math.round(zoom * 100)}%
           </span>
-          <button onClick={handleZoomIn} className="p-1.5 hover:bg-black/5 dark:hover:bg-white/10 rounded transition-colors" style={{ color: 'var(--text-secondary)' }} title="Zoom In">
-            <ZoomIn className="w-4 h-4" />
+          <button
+            type="button"
+            onClick={handleZoomIn}
+            className="p-1.5 hover:bg-black/5 dark:hover:bg-white/10 rounded transition-colors"
+            style={{ color: 'var(--text-secondary)' }}
+            aria-label="Zoom in"
+            title="Zoom in"
+          >
+            <ZoomIn className="w-4 h-4" aria-hidden="true" />
           </button>
-          <div className="w-px h-4 mx-1" style={{ background: 'var(--border)' }}></div>
-          <button onClick={handleZoomReset} className="p-1.5 hover:bg-black/5 dark:hover:bg-white/10 rounded transition-colors" style={{ color: 'var(--text-secondary)' }} title="100% Zoom">
-            <Maximize className="w-4 h-4" />
+          <div className="w-px h-4 mx-1" style={{ background: 'var(--border)' }} aria-hidden="true"></div>
+          <button
+            type="button"
+            onClick={handleZoomReset}
+            className="p-1.5 hover:bg-black/5 dark:hover:bg-white/10 rounded transition-colors"
+            style={{ color: 'var(--text-secondary)' }}
+            aria-label="Reset zoom to 100%"
+            title="Reset zoom"
+          >
+            <Maximize className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
       </div>

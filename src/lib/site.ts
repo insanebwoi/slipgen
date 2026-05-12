@@ -15,6 +15,12 @@ export const siteConfig = {
     "SlipGen turns student photos and details into beautiful, print-ready name slips. Smart layout engine packs A4/A3/13×19 paper with minimal waste, AI cartoonizes photos in a Pixar/Ghibli style, and 10+ templates cover everything from classic to anime to retro Y2K — built for schools, teachers, and event organizers.",
   ogImage: "/og.png",
   twitter: "@slipgenapp",
+  // Legal / contact — change these in the dashboard env or here directly when the
+  // brand identity is finalised. Used in privacy, terms, and the footer.
+  supportEmail: "hello@slipgen.in",
+  operator: "SlipGen, operated from India",
+  jurisdiction: "India",
+  lastLegalUpdate: "May 2026",
   keywords: [
     "student name slip generator",
     "name slip maker",

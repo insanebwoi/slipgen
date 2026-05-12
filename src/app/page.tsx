@@ -93,7 +93,7 @@ export default function HomePage() {
       </nav>
 
       {/* ===== HERO SECTION ===== */}
-      <section className="relative z-10 flex flex-col items-center text-center px-6 pt-16 pb-24 md:pt-28 md:pb-36">
+      <section id="main-content" tabIndex={-1} className="relative z-10 flex flex-col items-center text-center px-6 pt-16 pb-24 md:pt-28 md:pb-36">
         {/* Badge */}
         <div
           className="animate-fade-in-up mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-medium"
@@ -552,12 +552,19 @@ export default function HomePage() {
         className="relative z-10 px-6 md:px-12 py-8 text-center text-sm"
         style={{ color: "var(--text-muted)", borderTop: "1px solid var(--border)" }}
       >
-        <div className="flex items-center justify-center gap-2 mb-2">
+        <div className="flex items-center justify-center gap-2 mb-3">
           <Image src="/brand/logo-color.svg" alt="" width={16} height={16} aria-hidden="true" />
           <span className="font-semibold" style={{ color: "var(--text-secondary)" }}>
             SlipGen
           </span>
         </div>
+        <nav aria-label="Footer" className="flex items-center justify-center gap-4 mb-3 text-xs">
+          <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+          <span aria-hidden="true">·</span>
+          <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
+          <span aria-hidden="true">·</span>
+          <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
+        </nav>
         <p>© 2026 SlipGen. Smart Print Automation for Student Identity Materials.</p>
       </footer>
     </div>

@@ -120,3 +120,32 @@ export async function signOutAction() {
   revalidatePath("/", "layout");
   redirect("/");
 }
+
+/**
+ * Kicks off a Google OAuth flow. Returns the provider URL via redirect();
+ * the user lands on Google, then bounces back to /auth/callback?code=…
+ * which exchanges the code for a session and ensures a profile row exists.
+ */
+export async function signInWithGoogleAction(): Promise<{ error: string } | void> {
+  const h = await headers();
+  // Build an absolute callback URL from the incoming request. siteConfig.url is
+  // the canonical production origin, but using the request host means OAuth works
+  // for both localhost dev and Vercel preview deployments without env tweaks.
+  const host = h.get("x-forwarded-host") || h.get("host") || "localhost:3000";
+  const proto = h.get("x-forwarded-proto") || (host.startsWith("localhost") ? "http" : "https");
+  const redirectTo = `${proto}://${host}/auth/callback`;
+
+  const supabase = await getSupabaseServerClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo,
+      // Force account picker so users can switch Google accounts easily.
+      queryParams: { access_type: "offline", prompt: "select_account" },
+    },
+  });
+  if (error) return { error: error.message };
+  if (!data?.url) return { error: "Failed to get Google sign-in URL." };
+
+  redirect(data.url);
+}

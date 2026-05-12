@@ -15,6 +15,7 @@ export default function robots(): MetadataRoute.Robots {
           "/editor",
           "/admin",
           "/api/",
+          "/auth/",
           "/login",
           "/signup",
           "/banned",

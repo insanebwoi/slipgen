@@ -9,6 +9,7 @@ import TemplateSelector from "@/components/editor/TemplateSelector";
 import LayoutEngine from "@/components/editor/LayoutEngine";
 import ExportPanel from "@/components/editor/ExportPanel";
 import SlipPreview from "@/components/editor/SlipPreview";
+import WelcomeModal from "@/components/editor/WelcomeModal";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Maximize2, X } from "lucide-react";
@@ -30,6 +31,16 @@ export default function EditorClient({ serverPlan }: { serverPlan: UserPlan }) {
   useEffect(() => {
     setUserPlan(serverPlan);
   }, [serverPlan, setUserPlan]);
+
+  // Esc closes the fullscreen preview — standard modal expectation.
+  useEffect(() => {
+    if (!fullscreen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setFullscreen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [fullscreen]);
 
   const renderStep = () => {
     switch (currentStep) {
@@ -89,51 +100,63 @@ export default function EditorClient({ serverPlan }: { serverPlan: UserPlan }) {
             <SlipPreview />
           </div>
           <button
+            type="button"
             onClick={() => setFullscreen(true)}
             className="absolute top-3 right-3 p-2 rounded-lg transition-all hover:scale-105"
             style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)" }}
-            title="Fullscreen Preview"
+            aria-label="Open fullscreen preview"
+            title="Fullscreen preview"
           >
-            <Maximize2 className="w-4 h-4 text-white" />
+            <Maximize2 className="w-4 h-4 text-white" aria-hidden="true" />
           </button>
         </div>
 
         {/* Controls panel */}
-        <div className="w-full lg:w-[420px] xl:w-[480px] flex-shrink-0 overflow-y-auto p-5" style={{ borderRight: "1px solid var(--border)", maxHeight: "calc(100vh - 57px)" }}>
+        <main id="main-content" className="w-full lg:w-[420px] xl:w-[480px] flex-shrink-0 overflow-y-auto p-5" style={{ borderRight: "1px solid var(--border)", maxHeight: "calc(100vh - 57px)" }}>
           <div className="animate-fade-in">{renderStep()}</div>
-        </div>
+        </main>
 
         {/* Desktop preview: side panel on large screens */}
         <div className="hidden lg:flex flex-1 items-center justify-center p-8 overflow-auto relative" style={{ background: "var(--surface)", maxHeight: "calc(100vh - 57px)" }}>
           <SlipPreview />
           <button
+            type="button"
             onClick={() => setFullscreen(true)}
             className="absolute top-4 right-4 p-2.5 rounded-xl transition-all hover:scale-105"
             style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(8px)" }}
-            title="Fullscreen Preview"
+            aria-label="Open fullscreen preview"
+            title="Fullscreen preview"
           >
-            <Maximize2 className="w-5 h-5 text-white" />
+            <Maximize2 className="w-5 h-5 text-white" aria-hidden="true" />
           </button>
         </div>
       </div>
 
       {/* Fullscreen Preview Modal */}
       {fullscreen && (
-        <div className="fixed inset-0 z-50 flex flex-col" style={{ background: "var(--bg)" }}>
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="fullscreen-title"
+          className="fixed inset-0 z-50 flex flex-col"
+          style={{ background: "var(--bg)" }}
+        >
           {/* Fullscreen header */}
           <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: "1px solid var(--border)" }}>
             <div className="flex items-center gap-2">
               <Image src="/brand/logo-color.svg" alt="" width={20} height={20} aria-hidden="true" />
-              <span className="font-bold text-sm" style={{ fontFamily: "var(--font-display)" }}>
+              <span id="fullscreen-title" className="font-bold text-sm" style={{ fontFamily: "var(--font-display)" }}>
                 Preview <span style={{ color: "var(--text-muted)" }}>— Fullscreen</span>
               </span>
             </div>
             <button
+              type="button"
               onClick={() => setFullscreen(false)}
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all hover:bg-white/10"
               style={{ color: "var(--text-secondary)" }}
+              aria-label="Close fullscreen preview"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4" aria-hidden="true" />
               Close
             </button>
           </div>
@@ -143,6 +166,10 @@ export default function EditorClient({ serverPlan }: { serverPlan: UserPlan }) {
           </div>
         </div>
       )}
+
+      {/* First-run welcome — shown only when the workspace is empty and the
+          user hasn't dismissed it before. */}
+      <WelcomeModal />
     </div>
   );
 }

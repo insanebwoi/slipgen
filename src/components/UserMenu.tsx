@@ -65,8 +65,8 @@ export default function UserMenu() {
       </span>
       <span className="hidden md:inline text-xs" style={{ color: "var(--text-muted)" }}>{snap.email}</span>
       <form action={signOutAction}>
-        <button type="submit" className="text-xs flex items-center gap-1 px-2 py-1 rounded-md hover:bg-[var(--surface-elevated)]" style={{ color: "var(--text-secondary)" }}>
-          <LogOut className="w-3 h-3" />
+        <button type="submit" className="text-xs flex items-center gap-1 px-2 py-1 rounded-md hover:bg-[var(--surface-elevated)]" style={{ color: "var(--text-secondary)" }} aria-label="Sign out" title="Sign out">
+          <LogOut className="w-3 h-3" aria-hidden="true" />
         </button>
       </form>
     </div>

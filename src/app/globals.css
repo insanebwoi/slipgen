@@ -65,6 +65,75 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ===== Accessibility ===== */
+
+/* Visible focus ring for keyboard users. :focus-visible only activates on
+   keyboard navigation, so mouse clicks don't trigger an awkward ring. The
+   gradient-tinted outline matches brand colors and reads on any background. */
+:focus-visible {
+  outline: 2px solid var(--primary-light);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* Don't double-up the ring on elements that already have a focus border
+   (inputs already animate a brand border + glow on focus). */
+.input-field:focus-visible,
+input.input-field:focus-visible,
+textarea.input-field:focus-visible {
+  outline: none;
+}
+
+/* Screen-reader-only helper. Keeps content in the DOM for assistive tech
+   without showing it visually. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip-to-content link. Hidden off-screen until it receives focus (tab from
+   the address bar), then slides into view. Lets keyboard users jump past the
+   nav on every page. */
+.skip-link {
+  position: fixed;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  padding: 12px 20px;
+  background: var(--gradient-primary);
+  color: #fff;
+  border-radius: 0 0 8px 8px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: top 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+.skip-link:focus-visible {
+  top: 0;
+  outline: none;
+}
+
+/* Respect reduced motion: cancel decorative animations for users who've
+   opted out at the OS level. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* ===== Glassmorphism Card ===== */
 .glass-card {
   background: rgba(20, 20, 32, 0.6);
@@ -428,8 +497,21 @@ select.input-field {
   margin-bottom: 6px;
 }
 
-.tooltip:hover::after {
+.tooltip:hover::after,
+.tooltip:focus-visible::after {
   opacity: 1;
+}
+
+/* Multi-line variant for longer help text. Capped width so it doesn't span
+   the viewport on small screens. */
+.tooltip-multiline::after {
+  white-space: normal;
+  width: max-content;
+  max-width: min(260px, 80vw);
+  text-align: left;
+  line-height: 1.45;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border);
 }
 
 /* Sticky bottom action bar (mobile only). Used by every editor step so the
@@ -457,4 +539,48 @@ select.input-field {
     box-shadow: 0 -8px 16px -8px rgba(0, 0, 0, 0.25);
     backdrop-filter: blur(8px);
   }
+}
+
+/* Legal / long-form prose styling. Used by /privacy, /terms, /contact —
+   kept here (vs. a Tailwind plugin) so the legal pages have zero extra deps. */
+.legal-prose {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+.legal-prose h1 {
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5rem;
+  line-height: 1.15;
+}
+.legal-prose h1 + p { margin-top: 0; color: var(--text-muted); font-size: 0.85rem; }
+.legal-prose h2 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 2.5rem 0 0.75rem;
+}
+.legal-prose h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 1.5rem 0 0.5rem;
+}
+.legal-prose p { margin: 0.75rem 0; }
+.legal-prose ul { margin: 0.75rem 0 0.75rem 1.25rem; padding: 0; list-style: disc; }
+.legal-prose li { margin: 0.4rem 0; }
+.legal-prose a { color: var(--primary-light); text-decoration: underline; text-underline-offset: 2px; }
+.legal-prose a:hover { color: var(--primary); }
+.legal-prose strong { color: var(--text-primary); }
+.legal-prose code {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 0.85em;
 }

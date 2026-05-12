@@ -5,6 +5,7 @@ import { useState, useRef } from "react";
 import { useSlipGenStore } from "@/lib/store";
 import { Student } from "@/types";
 import { compressImageFile } from "@/lib/image-compress";
+import { useToast } from "@/components/Toast";
 import { Plus, Trash2, User, ArrowRight, Image as ImageIcon, X, ChevronDown, Pencil, Check, Loader2 } from "lucide-react";
 
 function generateId() {
@@ -13,6 +14,7 @@ function generateId() {
 
 export default function StudentForm() {
   const { students, addStudent, updateStudent, removeStudent, setStep, schoolList } = useSlipGenStore();
+  const toast = useToast();
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", className: "", schoolName: "" });
@@ -53,7 +55,7 @@ export default function StudentForm() {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !file.type.startsWith("image/")) return;
-    if (file.size > 25 * 1024 * 1024) { alert("Image must be under 25 MB"); return; }
+    if (file.size > 25 * 1024 * 1024) { toast.show({ type: "error", message: "Image must be under 25 MB." }); return; }
     // Compress to ~50 KB before storing. Phone-camera photos are 5-15 MB which
     // bloats the export DOM and reliably breaks html-to-image on iOS Safari.
     setImageFile(file);
@@ -83,6 +85,30 @@ export default function StudentForm() {
         <h2 className="text-xl font-bold mb-1" style={{ fontFamily: "var(--font-display)" }}>Add Students</h2>
         <p className="text-sm" style={{ color: "var(--text-secondary)" }}>Enter student details &amp; upload photos for AI transformation</p>
       </div>
+
+      {/* Zero-state — shown before any student is added AND the form is closed.
+          Gives new users a clear "what is this?" instead of staring at a blank
+          "Add Student" outline. Suppressed during the add flow itself so it
+          doesn't compete with the form. */}
+      {students.length === 0 && !isAdding && (
+        <div className="glass-card p-5 mb-4 text-center" style={{ borderColor: "rgba(99, 102, 241, 0.2)" }}>
+          <div
+            className="inline-flex items-center justify-center mb-3 rounded-2xl"
+            style={{
+              width: 48, height: 48,
+              background: "rgba(99, 102, 241, 0.12)",
+              color: "var(--primary-light)",
+            }}
+            aria-hidden="true"
+          >
+            <Plus className="w-6 h-6" />
+          </div>
+          <h3 className="text-sm font-semibold mb-1">Add your first student</h3>
+          <p className="text-xs" style={{ color: "var(--text-muted)", lineHeight: 1.5 }}>
+            Just a name is enough to get started. Photo, class, and roll number are optional — you can add or edit them later.
+          </p>
+        </div>
+      )}
 
       {/* Student List */}
       {students.length > 0 && (
@@ -125,11 +151,25 @@ export default function StudentForm() {
                     {[student.className, student.schoolName].filter(Boolean).join(" • ")}
                   </p>
                 </div>
-                <button onClick={() => startEdit(student)} className="p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[rgba(99,102,241,0.15)]" style={{ color: "var(--primary)" }} title="Edit">
-                  <Pencil className="w-3.5 h-3.5" />
+                <button
+                  type="button"
+                  onClick={() => startEdit(student)}
+                  className="p-1.5 rounded-md opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity hover:bg-[rgba(99,102,241,0.15)]"
+                  style={{ color: "var(--primary)" }}
+                  title="Edit student"
+                  aria-label={`Edit ${student.name}`}
+                >
+                  <Pencil className="w-3.5 h-3.5" aria-hidden="true" />
                 </button>
-                <button onClick={() => removeStudent(student.id)} className="p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/20" style={{ color: "var(--error)" }} title="Delete">
-                  <Trash2 className="w-4 h-4" />
+                <button
+                  type="button"
+                  onClick={() => removeStudent(student.id)}
+                  className="p-1.5 rounded-md opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity hover:bg-red-500/20"
+                  style={{ color: "var(--error)" }}
+                  title="Delete student"
+                  aria-label={`Delete ${student.name}`}
+                >
+                  <Trash2 className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
             )
@@ -155,8 +195,14 @@ export default function StudentForm() {
               <div className="flex flex-col items-center gap-1 mb-2">
                 <div className="relative w-20 h-20 rounded-xl overflow-hidden">
                   <img src={previewImage} alt="Preview" className="w-full h-full object-cover" />
-                  <button onClick={() => { setPreviewImage(null); setImageFile(null); setCompressedKB(null); }} className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "rgba(0,0,0,0.6)" }}>
-                    <X className="w-3 h-3" />
+                  <button
+                    type="button"
+                    onClick={() => { setPreviewImage(null); setImageFile(null); setCompressedKB(null); }}
+                    aria-label="Remove uploaded photo"
+                    className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center"
+                    style={{ background: "rgba(0,0,0,0.6)" }}
+                  >
+                    <X className="w-3 h-3" aria-hidden="true" />
                   </button>
                 </div>
                 {compressedKB !== null && (

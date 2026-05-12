@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Outfit, Roboto, Bebas_Neue } from "next/font/google";
 import "./globals.css";
 import AuthBoot from "@/components/AuthBoot";
+import CookieNotice from "@/components/CookieNotice";
+import { ToastProvider } from "@/components/Toast";
 import { siteConfig } from "@/lib/site";
 
 const inter = Inter({
@@ -267,8 +269,14 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col">
-        <AuthBoot />
-        {children}
+        {/* Skip-to-content link — first focus target on every page. Lets
+            keyboard users jump past the nav directly to the main content. */}
+        <a href="#main-content" className="skip-link">Skip to content</a>
+        <ToastProvider>
+          <AuthBoot />
+          {children}
+          <CookieNotice />
+        </ToastProvider>
       </body>
     </html>
   );
