@@ -10,7 +10,11 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
   const next = url.searchParams.get("next") || "/editor";
-  const origin = url.origin;
+  // Prefer NEXT_PUBLIC_SITE_URL so production never redirects users back to
+  // localhost when Supabase routes them through a different origin than the
+  // one we sent in `redirectTo`.
+  const origin =
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || url.origin;
 
   // The OAuth provider can also return ?error=… on cancel/denial.
   const oauthError = url.searchParams.get("error");

@@ -128,12 +128,22 @@ export async function signOutAction() {
  */
 export async function signInWithGoogleAction(): Promise<{ error: string } | void> {
   const h = await headers();
-  // Build an absolute callback URL from the incoming request. siteConfig.url is
-  // the canonical production origin, but using the request host means OAuth works
-  // for both localhost dev and Vercel preview deployments without env tweaks.
-  const host = h.get("x-forwarded-host") || h.get("host") || "localhost:3000";
-  const proto = h.get("x-forwarded-proto") || (host.startsWith("localhost") ? "http" : "https");
-  const redirectTo = `${proto}://${host}/auth/callback`;
+  // Build an absolute callback URL. Priority:
+  //   1. NEXT_PUBLIC_SITE_URL — explicit prod/staging origin
+  //   2. Vercel-provided host headers
+  //   3. localhost dev fallback
+  // Without (1), OAuth can bounce users back to localhost from production
+  // when the request goes through a CDN that strips x-forwarded-host.
+  const envUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
+  let origin: string;
+  if (envUrl) {
+    origin = envUrl;
+  } else {
+    const host = h.get("x-forwarded-host") || h.get("host") || "localhost:3000";
+    const proto = h.get("x-forwarded-proto") || (host.startsWith("localhost") ? "http" : "https");
+    origin = `${proto}://${host}`;
+  }
+  const redirectTo = `${origin}/auth/callback`;
 
   const supabase = await getSupabaseServerClient();
   const { data, error } = await supabase.auth.signInWithOAuth({
