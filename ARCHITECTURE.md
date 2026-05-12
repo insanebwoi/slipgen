@@ -38,4 +38,4 @@ This document outlines the high-level architecture and design patterns used in S
 - **Image Handling**: Client-side compression before processing to keep exports under 2MB.
 
 ---
-*Created by Antigravity AI for SlipGen.*
+
