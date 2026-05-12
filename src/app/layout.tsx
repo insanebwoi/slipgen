@@ -121,21 +121,21 @@ const softwareJsonLd = {
       name: "Free",
       price: "0",
       priceCurrency: "INR",
-      description: "2 AI-enhanced images, 3 basic templates, A4 layout",
+      description: "All templates, all paper sizes, HD export, SlipGen watermark",
     },
     {
       "@type": "Offer",
       name: "Basic",
       price: "299",
       priceCurrency: "INR",
-      description: "4 AI-enhanced images, all templates, A4 + A3 layouts, HD export",
+      description: "All templates, all paper sizes, HD export, No watermark, crop marks",
     },
     {
       "@type": "Offer",
       name: "Standard",
       price: "599",
       priceCurrency: "INR",
-      description: "Real AI Pixar/Disney cartoon, all templates, all paper sizes, custom watermark, bulk mode, priority support",
+      description: "All templates, all paper sizes, HD export, custom watermark, bulk mode",
     },
   ],
   aggregateRating: {
@@ -171,7 +171,7 @@ const faqJsonLd = {
       acceptedAnswer: {
         "@type": "Answer",
         text:
-          "SlipGen is a web app for schools and teachers that turns student photos and details into beautiful, print-ready name slips. It includes a smart layout engine that packs A4, A3, or 13×19 paper with minimal waste, AI photo cartoonization, and 10+ design templates.",
+          "SlipGen is a web app for schools and teachers that turns student photos and details into beautiful, print-ready name slips. It includes a smart layout engine that packs A4, A3, or 13×19 paper with minimal waste, and 10+ design templates.",
       },
     },
     {
@@ -180,7 +180,7 @@ const faqJsonLd = {
       acceptedAnswer: {
         "@type": "Answer",
         text:
-          "Yes — the Free plan covers 2 AI-enhanced images, 3 basic templates, A4 layout, and standard PDF export. Paid plans (Basic ₹299/mo, Standard ₹599/mo) unlock all templates, all paper sizes, HD 300 DPI export, custom watermarks, and bulk mode.",
+          "Yes — the Free plan covers all templates, all paper sizes, and HD 300 DPI export with a small SlipGen watermark. Paid plans (Basic ₹299/mo, Standard ₹599/mo) remove the watermark or allow custom watermarks and bulk mode.",
       },
     },
     {
@@ -198,7 +198,7 @@ const faqJsonLd = {
       acceptedAnswer: {
         "@type": "Answer",
         text:
-          "Yes. The Standard plan uses AI to transform each student photo into a Pixar/Disney-style 3D cartoon character based on their passion (doctor, engineer, artist, etc.). Free and Basic plans use a client-side soft cartoon effect (smoothing + warm tones) without AI.",
+          "SlipGen offers a soft cartoon effect (smoothing + warm tones) to make student photos look professional and artistic. Real-time preview lets you see the effect before you print.",
       },
     },
     {

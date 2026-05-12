@@ -15,19 +15,19 @@ export default function LayoutEngine() {
 
   const paperSizes = Object.keys(PAPER_SIZES) as PaperSize[];
 
-  // Paid plans can customize watermark text, toggle it off, upload a logo, change opacity.
-  // Free plan is locked: watermark is forced on with text "SlipGen" — no controls.
-  const canCustomizeWatermark = ['basic', 'standard'].includes(userPlan);
-  // Logo upload is paid-only too.
-  const canUploadLogo = canCustomizeWatermark;
+  // Basic and Standard can toggle the watermark off.
+  const canToggleWatermark = ['basic', 'standard'].includes(userPlan);
+  // Only Standard can customize text or upload a logo.
+  const canCustomizeWatermark = userPlan === 'standard';
+  const canUploadLogo = userPlan === 'standard';
 
-  // Lock free plan to the SlipGen brand logo watermark — can't be disabled, swapped, or changed.
+  // Lock free plan to the SlipGen brand logo watermark — can't be disabled.
   useEffect(() => {
-    if (canCustomizeWatermark) return;
+    if (canToggleWatermark) return;
     if (!watermark.enabled || watermark.type !== 'logo' || watermark.logoUrl !== SLIPGEN_LOGO_URL) {
       setWatermark({ enabled: true, type: 'logo', logoUrl: SLIPGEN_LOGO_URL });
     }
-  }, [canCustomizeWatermark, watermark.enabled, watermark.type, watermark.logoUrl, setWatermark]);
+  }, [canToggleWatermark, watermark.enabled, watermark.type, watermark.logoUrl, setWatermark]);
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -182,7 +182,7 @@ export default function LayoutEngine() {
           Watermark
         </label>
 
-        {!canCustomizeWatermark && (
+        {!canToggleWatermark && (
           <div className="p-3 rounded-lg flex items-center gap-3" style={{ background: "rgba(245, 158, 11, 0.08)", border: "1px solid rgba(245, 158, 11, 0.2)" }}>
             <img src={SLIPGEN_LOGO_URL} alt="SlipGen" className="w-10 h-10 rounded-md object-contain flex-shrink-0" style={{ background: "rgba(255,255,255,0.08)" }} />
             <div className="flex-1 min-w-0">
@@ -190,13 +190,13 @@ export default function LayoutEngine() {
                 <Lock className="w-3 h-3" /> Free plan: SlipGen logo watermark is fixed
               </p>
               <p className="text-[10px] mt-1" style={{ color: "var(--text-muted)" }}>
-                Upgrade to Basic or Standard to swap it for your school logo, change opacity, or remove it.
+                Upgrade to Basic to remove the watermark, or Standard to add your own school logo.
               </p>
             </div>
           </div>
         )}
 
-        {canCustomizeWatermark && (
+        {canToggleWatermark && (
         <>
         {/* Enable/Disable */}
         <label className="flex items-center gap-3 cursor-pointer mb-3">
@@ -211,92 +211,92 @@ export default function LayoutEngine() {
 
         {watermark.enabled && (
           <div className="ml-1 space-y-3">
-            {/* Type Toggle */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => setWatermark({ type: 'text' })}
-                className="flex-1 py-2 rounded-lg text-xs font-medium border transition-all"
-                style={{
-                  background: watermark.type === 'text' ? 'var(--primary)' : 'var(--surface-elevated)',
-                  color: watermark.type === 'text' ? '#fff' : 'var(--text-secondary)',
-                  borderColor: watermark.type === 'text' ? 'var(--primary)' : 'var(--border)',
-                }}
-              >
-                📝 Text
-              </button>
-              <button
-                onClick={() => {
-                  if (canUploadLogo) {
-                    setWatermark({ type: 'logo' });
-                  }
-                }}
-                className="flex-1 py-2 rounded-lg text-xs font-medium border transition-all relative"
-                style={{
-                  background: watermark.type === 'logo' ? 'var(--primary)' : 'var(--surface-elevated)',
-                  color: watermark.type === 'logo' ? '#fff' : canUploadLogo ? 'var(--text-secondary)' : 'var(--text-muted)',
-                  borderColor: watermark.type === 'logo' ? 'var(--primary)' : 'var(--border)',
-                  opacity: canUploadLogo ? 1 : 0.5,
-                }}
-              >
-                🖼️ Logo {!canUploadLogo && '🔒'}
-              </button>
-            </div>
-
-            {!canUploadLogo && watermark.type === 'text' && (
-              <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>
-                Upgrade to Basic plan to upload your school logo as watermark
-              </p>
-            )}
-
-            {/* Text Input */}
-            {watermark.type === 'text' && (
-              <input
-                type="text"
-                className="input-field text-sm"
-                placeholder="Watermark text (e.g., School Name)"
-                value={watermark.text}
-                onChange={(e) => setWatermark({ text: e.target.value })}
-              />
-            )}
-
-            {/* Logo Upload */}
-            {watermark.type === 'logo' && canUploadLogo && (
-              <div>
-                <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
-                {watermark.logoUrl ? (
-                  <div className="flex items-center gap-3">
-                    <img src={watermark.logoUrl} alt="Logo" className="w-12 h-12 rounded-lg object-contain" style={{ background: "var(--surface-hover)" }} />
-                    <div className="flex-1">
-                      <p className="text-xs text-green-500 font-medium">Logo uploaded ✓</p>
-                      <button onClick={() => logoInputRef.current?.click()} className="text-[10px] underline" style={{ color: "var(--primary)" }}>
-                        Change logo
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => logoInputRef.current?.click()}
-                    className="w-full py-3 rounded-lg border-2 border-dashed flex items-center justify-center gap-2 text-xs transition-colors hover:border-[var(--primary)]"
-                    style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
-                  >
-                    <Upload className="w-4 h-4" /> Upload school logo
-                  </button>
-                )}
+            {!canCustomizeWatermark ? (
+              <div className="p-3 rounded-lg flex items-center gap-3" style={{ background: "rgba(99, 102, 241, 0.05)", border: "1px solid rgba(99, 102, 241, 0.1)" }}>
+                <img src={SLIPGEN_LOGO_URL} alt="SlipGen" className="w-8 h-8 rounded-md object-contain flex-shrink-0" />
+                <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>
+                  Basic plan: You can remove the watermark, but customization requires Standard plan.
+                </p>
               </div>
-            )}
+            ) : (
+              <>
+                {/* Type Toggle */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setWatermark({ type: 'text' })}
+                    className="flex-1 py-2 rounded-lg text-xs font-medium border transition-all"
+                    style={{
+                      background: watermark.type === 'text' ? 'var(--primary)' : 'var(--surface-elevated)',
+                      color: watermark.type === 'text' ? '#fff' : 'var(--text-secondary)',
+                      borderColor: watermark.type === 'text' ? 'var(--primary)' : 'var(--border)',
+                    }}
+                  >
+                    📝 Text
+                  </button>
+                  <button
+                    onClick={() => setWatermark({ type: 'logo' })}
+                    className="flex-1 py-2 rounded-lg text-xs font-medium border transition-all"
+                    style={{
+                      background: watermark.type === 'logo' ? 'var(--primary)' : 'var(--surface-elevated)',
+                      color: watermark.type === 'logo' ? '#fff' : 'var(--text-secondary)',
+                      borderColor: watermark.type === 'logo' ? 'var(--primary)' : 'var(--border)',
+                    }}
+                  >
+                    🖼️ Logo
+                  </button>
+                </div>
 
-            {/* Opacity */}
-            <div>
-              <label className="text-xs mb-1 block" style={{ color: "var(--text-secondary)" }}>
-                Opacity: {Math.round((watermark.opacity ?? 0.15) * 100)}%
-              </label>
-              <input
-                type="range"
-                min={20} max={100} value={Math.round((watermark.opacity ?? 0.15) * 100)}
-                onChange={(e) => setWatermark({ opacity: parseInt(e.target.value) / 100 })}
-                className="w-full accent-[var(--primary)]"
-              />
-            </div>
+                {/* Text Input */}
+                {watermark.type === 'text' && (
+                  <input
+                    type="text"
+                    className="input-field text-sm"
+                    placeholder="Watermark text (e.g., School Name)"
+                    value={watermark.text}
+                    onChange={(e) => setWatermark({ text: e.target.value })}
+                  />
+                )}
+
+                {/* Logo Upload */}
+                {watermark.type === 'logo' && (
+                  <div>
+                    <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+                    {watermark.logoUrl && watermark.logoUrl !== SLIPGEN_LOGO_URL ? (
+                      <div className="flex items-center gap-3">
+                        <img src={watermark.logoUrl} alt="Logo" className="w-12 h-12 rounded-lg object-contain" style={{ background: "var(--surface-hover)" }} />
+                        <div className="flex-1">
+                          <p className="text-xs text-green-500 font-medium">Logo uploaded ✓</p>
+                          <button onClick={() => logoInputRef.current?.click()} className="text-[10px] underline" style={{ color: "var(--primary)" }}>
+                            Change logo
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => logoInputRef.current?.click()}
+                        className="w-full py-3 rounded-lg border-2 border-dashed flex items-center justify-center gap-2 text-xs transition-colors hover:border-[var(--primary)]"
+                        style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
+                      >
+                        <Upload className="w-4 h-4" /> Upload school logo
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* Opacity */}
+                <div>
+                  <label className="text-xs mb-1 block" style={{ color: "var(--text-secondary)" }}>
+                    Opacity: {Math.round((watermark.opacity ?? 0.15) * 100)}%
+                  </label>
+                  <input
+                    type="range"
+                    min={20} max={100} value={Math.round((watermark.opacity ?? 0.15) * 100)}
+                    onChange={(e) => setWatermark({ opacity: parseInt(e.target.value) / 100 })}
+                    className="w-full accent-[var(--primary)]"
+                  />
+                </div>
+              </>
+            )}
           </div>
         )}
         </>

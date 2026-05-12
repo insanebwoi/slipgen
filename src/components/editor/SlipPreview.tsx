@@ -55,7 +55,7 @@ export default function SlipPreview() {
     );
   }
 
-  if (currentStep === "students" || currentStep === "ai-process" || currentStep === "template") {
+  if (currentStep === "students" || currentStep === "template") {
     const previewStudent: Student = students[0] || {
       id: "preview", name: "Student Name", className: "5th", division: "A", rollNo: "01", subject: "Mathematics",
       schoolName: "Sample School", passion: "Scientist", gender: "child", imageUrl: null, imageFile: null,

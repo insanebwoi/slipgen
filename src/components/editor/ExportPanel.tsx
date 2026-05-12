@@ -235,7 +235,7 @@ export default function ExportPanel() {
       // via the default String() coercion, which is useless to the user.
       const msg =
         err instanceof Error ? err.message :
-        err instanceof Event  ? "An image inside the preview failed to load (likely a student photo). Try removing AI photos and re-export." :
+        err instanceof Event  ? "An image inside the preview failed to load (likely a student photo). Try re-uploading the photo and re-export." :
         typeof err === "string" ? err :
         "Unknown error";
       setExportError(
@@ -394,7 +394,7 @@ export default function ExportPanel() {
                   <span className="text-sm text-[var(--text-secondary)] group-hover:text-white">Remove Watermark</span>
                 </div>
                 <span className="text-xs font-semibold px-2 py-1 rounded flex items-center gap-1" style={{ background: "rgba(37, 211, 102, 0.1)", color: "#25D366" }}>
-                  💬 Upgrade
+                  💬 Upgrade to Basic
                 </span>
               </a>
 
@@ -410,26 +410,47 @@ export default function ExportPanel() {
                   <span className="text-sm text-[var(--text-secondary)] group-hover:text-white">Add Custom Watermark</span>
                 </div>
                 <span className="text-xs font-semibold px-2 py-1 rounded flex items-center gap-1" style={{ background: "rgba(37, 211, 102, 0.1)", color: "#25D366" }}>
+                  💬 Upgrade to Standard
+                </span>
+              </a>
+            </>
+          ) : userPlan === 'basic' ? (
+            <>
+              <div className="flex items-center justify-between p-3 rounded-lg border border-[var(--success)]" style={{ background: "rgba(16, 185, 129, 0.08)" }}>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4" style={{ color: "var(--success)" }} />
+                  <span className="text-sm font-medium">Watermark Removed</span>
+                </div>
+                <span className="text-xs font-semibold px-2 py-1 rounded" style={{ background: "rgba(16, 185, 129, 0.15)", color: "var(--success)" }}>
+                  Basic Plan
+                </span>
+              </div>
+              <a
+                href={`https://wa.me/919544464144?text=${encodeURIComponent("Hi! I'm on the Basic plan and I'd like to upgrade to Standard to add my own custom watermark.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-between p-3 rounded-lg border border-[var(--border)] transition-all hover:border-green-500 group"
+                style={{ background: "var(--surface)" }}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full border border-[var(--text-muted)] group-hover:border-green-500" />
+                  <span className="text-sm text-[var(--text-secondary)] group-hover:text-white">Add Custom Watermark</span>
+                </div>
+                <span className="text-xs font-semibold px-2 py-1 rounded flex items-center gap-1" style={{ background: "rgba(37, 211, 102, 0.1)", color: "#25D366" }}>
                   💬 Upgrade
                 </span>
               </a>
             </>
           ) : (
-            <>
-              {/* Basic / Standard: full watermark control — no upsells needed */}
-              <div className="flex items-center justify-between p-3 rounded-lg border border-[var(--success)]" style={{ background: "rgba(16, 185, 129, 0.08)" }}>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4" style={{ color: "var(--success)" }} />
-                  <span className="text-sm font-medium">Custom Watermark</span>
-                </div>
-                <span className="text-xs font-semibold px-2 py-1 rounded" style={{ background: "rgba(16, 185, 129, 0.15)", color: "var(--success)" }}>
-                  {userPlan.charAt(0).toUpperCase() + userPlan.slice(1)} Plan
-                </span>
+            <div className="flex items-center justify-between p-3 rounded-lg border border-[var(--success)]" style={{ background: "rgba(16, 185, 129, 0.08)" }}>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" style={{ color: "var(--success)" }} />
+                <span className="text-sm font-medium">Custom Watermark Unlocked</span>
               </div>
-              <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                Manage your watermark settings in the Layout step.
-              </p>
-            </>
+              <span className="text-xs font-semibold px-2 py-1 rounded" style={{ background: "rgba(16, 185, 129, 0.15)", color: "var(--success)" }}>
+                Standard Plan
+              </span>
+            </div>
           )}
         </div>
       </div>

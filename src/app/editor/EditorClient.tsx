@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useSlipGenStore } from "@/lib/store";
 import StepIndicator from "@/components/editor/StepIndicator";
 import StudentForm from "@/components/editor/StudentForm";
-import AIProcessor from "@/components/editor/AIProcessor";
 import TemplateSelector from "@/components/editor/TemplateSelector";
 import LayoutEngine from "@/components/editor/LayoutEngine";
 import ExportPanel from "@/components/editor/ExportPanel";
@@ -45,7 +44,6 @@ export default function EditorClient({ serverPlan }: { serverPlan: UserPlan }) {
   const renderStep = () => {
     switch (currentStep) {
       case "students": return <StudentForm />;
-      case "ai-process": return <AIProcessor />;
       case "template": return <TemplateSelector />;
       case "layout": return <LayoutEngine />;
       case "export": return <ExportPanel />;

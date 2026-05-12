@@ -127,7 +127,7 @@ export default function HomePage() {
             animationDelay: "0.2s",
           }}
         >
-          Generate AI-enhanced, print-ready student name slips with optimized
+          Generate print-ready student name slips with optimized
           layouts that save paper and look stunning.
         </p>
 
@@ -381,11 +381,11 @@ export default function HomePage() {
                 price: "₹0",
                 period: "forever",
                 features: [
-                  "2 AI-enhanced images",
-                  "3 basic templates",
-                  "A4 layout only",
+                  "All templates",
+                  "All paper sizes (A4, A3, 13x19)",
+                  "HD export (300 DPI)",
                   "SlipGen watermark",
-                  "Standard export",
+                  "Unlimited downloads",
                 ],
                 cta: "Start Free",
                 featured: false,
@@ -396,12 +396,12 @@ export default function HomePage() {
                 price: "₹299",
                 period: "/ month",
                 features: [
-                  "4 AI-enhanced images",
                   "All templates",
-                  "A4 + A3 layouts",
-                  "Light watermark",
+                  "All paper sizes",
                   "HD export (300 DPI)",
+                  "No watermark",
                   "Crop marks",
+                  "Unlimited downloads",
                 ],
                 cta: "Get Basic on WhatsApp",
                 featured: true,
@@ -412,12 +412,12 @@ export default function HomePage() {
                 price: "₹599",
                 period: "/ month",
                 features: [
-                  "Real AI Pixar/Disney cartoon",
                   "All templates",
                   "All paper sizes",
-                  "Custom watermark + logo",
+                  "HD export (300 DPI)",
+                  "Add your own watermark",
+                  "Custom logo upload",
                   "Bulk mode",
-                  "Priority support",
                 ],
                 cta: "Go Standard on WhatsApp",
                 featured: false,

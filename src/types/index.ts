@@ -112,7 +112,7 @@ export interface Project {
   updatedAt: Date;
 }
 
-export type EditorStep = 'students' | 'ai-process' | 'template' | 'layout' | 'export';
+export type EditorStep = 'students' | 'template' | 'layout' | 'export';
 
 export type UserPlan = 'free' | 'basic' | 'standard';
 

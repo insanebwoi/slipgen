@@ -128,7 +128,7 @@ export default function OG() {
               lineHeight: 1.3,
             }}
           >
-            AI-enhanced, print-ready student name slips with smart layouts that
+            Print-ready student name slips with smart layouts that
             save paper and look stunning.
           </div>
         </div>
@@ -142,7 +142,7 @@ export default function OG() {
             zIndex: 1,
           }}
         >
-          {["10+ Templates", "AI Cartoons", "A4 / A3 / 13×19", "Print-Ready PDF"].map(
+          {["10+ Templates", "A4 / A3 / 13×19", "Print-Ready PDF"].map(
             (label) => (
               <div
                 key={label}

@@ -6,13 +6,12 @@ import { Users, Sparkles, Palette, Layout, FileDown, Check } from "lucide-react"
 
 const steps: { key: EditorStep; label: string; icon: React.ReactNode }[] = [
   { key: "students", label: "Students", icon: <Users className="w-3.5 h-3.5" /> },
-  { key: "ai-process", label: "AI Magic", icon: <Sparkles className="w-3.5 h-3.5" /> },
   { key: "template", label: "Template", icon: <Palette className="w-3.5 h-3.5" /> },
   { key: "layout", label: "Layout", icon: <Layout className="w-3.5 h-3.5" /> },
   { key: "export", label: "Export", icon: <FileDown className="w-3.5 h-3.5" /> },
 ];
 
-const stepOrder: EditorStep[] = ["students", "ai-process", "template", "layout", "export"];
+const stepOrder: EditorStep[] = ["students", "template", "layout", "export"];
 
 export default function StepIndicator() {
   const { currentStep, setStep, students, selectedTemplate } = useSlipGenStore();
@@ -21,10 +20,9 @@ export default function StepIndicator() {
   const isStepAccessible = (step: EditorStep) => {
     const idx = stepOrder.indexOf(step);
     if (idx === 0) return true;
-    if (idx === 1) return students.length > 0; // ai-process
-    if (idx === 2) return students.length > 0; // template
+    if (idx === 1) return students.length > 0; // template
+    if (idx === 2) return students.length > 0 && selectedTemplate !== null;
     if (idx === 3) return students.length > 0 && selectedTemplate !== null;
-    if (idx === 4) return students.length > 0 && selectedTemplate !== null;
     return false;
   };
 

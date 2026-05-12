@@ -10,9 +10,9 @@ export const siteConfig = {
   name: "SlipGen",
   url: (process.env.NEXT_PUBLIC_SITE_URL || FALLBACK_URL).replace(/\/$/, ""),
   shortDescription:
-    "AI-enhanced student name slip generator with smart layouts.",
+    "Student name slip generator with smart print-ready layouts.",
   longDescription:
-    "SlipGen turns student photos and details into beautiful, print-ready name slips. Smart layout engine packs A4/A3/13×19 paper with minimal waste, AI cartoonizes photos in a Pixar/Ghibli style, and 10+ templates cover everything from classic to anime to retro Y2K — built for schools, teachers, and event organizers.",
+    "SlipGen turns student photos and details into beautiful, print-ready name slips. Smart layout engine packs A4/A3/13×19 paper with minimal waste, and 10+ templates cover everything from classic to anime to retro Y2K — built for schools, teachers, and event organizers.",
   ogImage: "/og.png",
   twitter: "@slipgenapp",
   // Legal / contact — change these in the dashboard env or here directly when the

@@ -19,7 +19,7 @@ export default function TemplateSelector() {
         ))}
       </div>
       <div className="step-actions">
-        <button onClick={() => setStep("ai-process")} className="btn-secondary flex-1 flex items-center justify-center gap-2">
+        <button onClick={() => setStep("students")} className="btn-secondary flex-1 flex items-center justify-center gap-2">
           <ArrowLeft className="w-4 h-4" /> Back
         </button>
         <button onClick={() => { if (selectedTemplate) setStep("layout"); }} disabled={!selectedTemplate} className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:opacity-40">

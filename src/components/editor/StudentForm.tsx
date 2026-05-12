@@ -83,7 +83,7 @@ export default function StudentForm() {
     <div>
       <div className="mb-6">
         <h2 className="text-xl font-bold mb-1" style={{ fontFamily: "var(--font-display)" }}>Add Students</h2>
-        <p className="text-sm" style={{ color: "var(--text-secondary)" }}>Enter student details &amp; upload photos for AI transformation</p>
+        <p className="text-sm" style={{ color: "var(--text-secondary)" }}>Enter student details &amp; upload photos</p>
       </div>
 
       {/* Zero-state — shown before any student is added AND the form is closed.
@@ -277,8 +277,8 @@ export default function StudentForm() {
 
       {students.length > 0 && !isAdding && (
         <div className="step-actions" style={{ marginTop: "1.25rem" }}>
-          <button onClick={() => setStep("ai-process")} className="btn-primary w-full flex items-center justify-center gap-2">
-            AI Magic ✨ <ArrowRight className="w-4 h-4" />
+          <button onClick={() => setStep("template")} className="btn-primary w-full flex items-center justify-center gap-2">
+            Choose Template <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       )}
